@@ -1,0 +1,471 @@
+import { FaArrowLeft, FaArrowRight, FaCheckCircle, FaRegCalendarAlt, FaTimes, FaTv } from "react-icons/fa"
+import { PiSecurityCameraDuotone } from "react-icons/pi";
+import { TbAirConditioning, TbFridge } from "react-icons/tb";
+import { MdOutlineLtePlusMobiledata } from "react-icons/md";
+import { FaLocationDot, FaStar } from "react-icons/fa6"
+import { Link } from "react-router-dom"
+import { useState } from "react"
+import DatePicker, { DateObject } from "react-multi-date-picker"
+import persian from "react-date-object/calendars/persian"
+import persian_fa from "react-date-object/locales/persian_fa"
+import "react-multi-date-picker/styles/colors/teal.css"
+import { IoIosWater } from "react-icons/io";
+import { CiNoWaitingSign } from "react-icons/ci";
+import Footer from "../../components/Footer";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+
+const toPersianNum = (num: number | string): string => {
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+  return num.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
+};
+
+const toPersianPrice = (num: number): string => {
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+  const englishPrice = num.toLocaleString('en-US');
+  return englishPrice.replace(/\d/g, (d) => persianDigits[parseInt(d)]).replace(/,/g, '،');
+};
+
+const House = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [entryDate, setEntryDate] = useState<DateObject>(new DateObject({ calendar: persian }));
+  const [exitDate, setExitDate] = useState<DateObject>(new DateObject({ calendar: persian }).add(1, "day"));
+  const [adults, setAdults] = useState<number>(1);
+  const [children, setChildren] = useState<number>(0);
+
+  const images = [
+    "/villa/1.jpg",
+    "/villa/2.jpg",
+    "/villa/3.jpg",
+    "/villa/4.jpg",
+    "/villa/5.jpg"
+  ];
+
+  const similarVillas = [
+    {
+      id: 1,
+      name: "ویلا دوخوابه روستایی گلستان 1",
+      location: "استان البرز، چهارباغ",
+      rating: 4.5,
+      reviews: 150,
+      price: 1150000,
+      image: images[0],
+      unitCapacity: 5,
+      units: 2
+    },
+    {
+      id: 2,
+      name: "ویلا سه خوابه کوهستانی البرز",
+      location: "استان البرز، کرج",
+      rating: 4.2,
+      reviews: 120,
+      price: 1350000,
+      image: images[1],
+      unitCapacity: 6,
+      units: 1
+    },
+    {
+      id: 3,
+      name: "ویلا یک خوابه باغی ساوجبلاغ",
+      location: "استان البرز، ساوجبلاغ",
+      rating: 4.4,
+      reviews: 180,
+      price: 950000,
+      image: images[2],
+      unitCapacity: 4,
+      units: 1
+    },
+    {
+      id: 4,
+      name: "ویلا دوخوابه جنگلی طالقان",
+      location: "استان البرز، طالقان",
+      rating: 4.6,
+      reviews: 200,
+      price: 1250000,
+      image: images[3],
+      unitCapacity: 5,
+      units: 2
+    }
+  ];
+
+  const openModal = (index: number) => {
+    setSelectedIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const nextImage = () => {
+    setSelectedIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setSelectedIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleEntryDateChange = (date: DateObject) => {
+    setEntryDate(date);
+    if (date && exitDate && date.unix > exitDate.unix) {
+      setExitDate(new DateObject({ calendar: persian }).set("date", date).add(1, "day"));
+    }
+  };
+
+  const handleExitDateChange = (date: DateObject) => {
+    setExitDate(date);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="pt-3">
+        <Link to={'/'} className="">
+          <img src="/logo.png" alt="" className="h-11 px-4" />
+        </Link>
+      </div>
+
+      <div className="h-px w-full bg-neutral-500" />
+
+      <div className="mx-auto min-h-screen w-5xl py-7 space-y-5">
+        <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-3.5">
+            <h2 className="font-bold text-xl">ویلا دوخوابه روستایی گلستان 2 </h2>
+            <div className="flex gap-3 text-sm">
+              <p className="flex items-center gap-2">
+                <span>
+                  <FaStar size={15} className="text-yellow-400" />
+                </span>
+                <span>
+                  4.3
+                  (195 نظر ثبت شده)
+                </span>
+              </p>
+
+              <p className="flex items-center gap-2">
+                <span>
+                  <FaLocationDot size={15} className="text-yellow-400" />
+                </span>
+                <span>
+                  استان البرز، چهارباغ
+                </span>
+              </p>
+
+              <p className="bg-red-500 text-white p-1 px-3 rounded-2xl">
+                % تا 5 درصد تخفیف
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+        {/* IMAGE GALLERY START */}
+        <div className="w-full h-[410px] flex gap-4 group">
+          <div className="w-full h-full">
+            <img
+              src={images[0]}
+              alt=""
+              className="h-full group-hover:opacity-45 hover:rounded-xl hover:opacity-100 transition-all cursor-pointer duration-300 object-cover"
+              onClick={() => openModal(0)}
+            />
+          </div>
+
+          <div className="w-[725px] grid grid-cols-2 grid-rows-2 gap-2">
+            <img
+              src={images[1]}
+              alt=""
+              className="h-full group-hover:opacity-45 hover:rounded-xl hover:opacity-100 transition-all cursor-pointer duration-300 object-cover"
+              onClick={() => openModal(1)}
+            />
+            <img
+              src={images[2]}
+              alt=""
+              className="h-full group-hover:opacity-45 hover:rounded-xl hover:opacity-100 transition-all cursor-pointer duration-300 object-cover"
+              onClick={() => openModal(2)}
+            />
+            <img
+              src={images[3]}
+              alt=""
+              className="h-full group-hover:opacity-45 hover:rounded-xl hover:opacity-100 transition-all cursor-pointer duration-300 object-cover"
+              onClick={() => openModal(3)}
+            />
+            <img
+              src={images[4]}
+              alt=""
+              className="h-full group-hover:opacity-45 hover:rounded-xl hover:opacity-100 transition-all cursor-pointer duration-300 object-cover"
+              onClick={() => openModal(4)}
+            />
+          </div>
+        </div>
+        {/* IMAGE GALLERY END */}
+
+
+        <div className="grid grid-cols-5 gap-4">
+          <div className="col-span-3">
+            <p className="font-black text-xl">ویلا</p>
+            <p className="">اجاره ویلا در چهارباغ به میزبانی وحید رجبلو </p>
+
+            <div className="w-full h-px bg-gray-800 mt-12" />
+
+            <p className="font-black text-xl mt-8">امکان پرداخت اقساطی</p>
+            <p className="">پرداخت اقساطی از طریق اسنپ‌پی </p>
+
+            <p className="font-black text-xl mt-8">بدون دغدغه رزرو کن </p>
+            <p className="max-w-11/12">در صورت ایجاد شرایط اضطراری در کشور مبلغ رزرو شما به‌طور کامل و بدون قید و شرط بازگشت داده خواهد شد.  </p>
+
+            <p className="font-black text-xl mt-8">رزرو آنی و قطعی جاباما </p>
+            <p className="max-w-11/12">برای رزرو نهایی این مجتمع اقامتگاهی نیازی به تایید از سمت میزبان نخواهید داشت و رزرو شما قطعی خواهد بود.  </p>
+
+            <div className="w-full h-px bg-gray-800 mt-12" />
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <p className="flex justify-between w-1/2 mx-auto">
+                آنتن دهی موبایل
+                <MdOutlineLtePlusMobiledata size={28} />
+              </p>
+              <p className="flex justify-between w-1/2 mx-auto">
+                سیستم سرمایشی
+                <TbAirConditioning size={25} />
+              </p>
+
+              <p className="flex justify-between w-1/2 mx-auto">
+                یخچال
+                <TbFridge size={25} />
+              </p>
+              <p className="flex justify-between w-1/2 mx-auto">
+                تلویزیون
+                <FaTv size={25} />
+              </p>
+
+              <p className="flex justify-between w-1/2 mx-auto">
+                آب آشامیدنی
+                <IoIosWater size={25} />
+              </p>
+              <p className="flex justify-between w-1/2 mx-auto">
+                نگهبان
+                <PiSecurityCameraDuotone size={25} />
+              </p>
+            </div>
+
+            <p className="font-black text-xl mt-16">اطلاعات و فاصله مراکز نزدیک مجتمع اقامتگاهی </p>
+            <p className="max-w-11/12 mt-3">تمامی فواصل به صورت حدودی و در شرایط معمولی ترافیک می‌باشد.  </p>
+
+            <p className="font-black text-xl mt-12 mb-2">مقررات مجتمع اقامتگاهی </p>
+            <p className="flex gap-2 items-center mt-3 text-green-700">
+              <FaCheckCircle size={20} color="green" />
+              <span>پذیرش گروه‌های مجردی (فقط آقایان یا خانم‌ها) فراهم است.  </span>
+            </p>
+            <p className="flex gap-2 items-center mt-1 text-red-700">
+              <CiNoWaitingSign size={20} color="red" />
+              <span>استعمال دخانیات مجاز نیست.  </span>
+            </p>
+            <p className="flex gap-2 items-center mt-1 text-red-700">
+              <CiNoWaitingSign size={20} color="red" />
+              <span>ورود حیوانات خانگی مجاز نیست.  </span>
+            </p>
+            <p className="flex gap-2 items-center mt-1 text-red-700">
+              <CiNoWaitingSign size={20} color="red" />
+              <span>برگزاری مراسم مجاز نیست.  </span>
+            </p>
+
+          </div>
+
+          <div className="col-span-2 border rounded-xl p-5 space-y-3" >
+            <div className="flex justify-between items-center">
+              <p className="text-sm">شروع از: 1,210,000 تومان / هرشب</p>
+              <p className="flex items-center gap-2 text-xs">
+                <span>
+                  <FaStar size={15} className="text-yellow-400" />
+                </span>
+                <span>
+                  4.3
+                  (195 نظر ثبت شده)
+                </span>
+              </p>
+
+            </div>
+
+            <div className="rounded overflow-hidden border p-2 mx-2">
+              <div className="flex w-full">
+                <div className="flex items-center justify-center border text-sm text-neutral-600 gap-3 w-full h-full py-5">
+                  <FaRegCalendarAlt />
+                  <DatePicker
+                    className="teal custom-rmdp"
+                    numberOfMonths={2}
+                    showOtherDays={true}
+                    value={entryDate}
+                    onChange={handleEntryDateChange}
+                    calendar={persian}
+                    locale={persian_fa}
+                    calendarPosition="bottom-center"
+                    minDate={new DateObject({ calendar: persian })}
+                    maxDate={exitDate}
+                    format="dddd DD MMMM"
+                    portal={false}
+                    offsetY={15}
+                    render={(value, openCalendar) => (
+                      <span onClick={openCalendar} className="cursor-pointer">
+                        {entryDate ? entryDate.format("dddd DD MMMM") : "تاریخ ورود"}
+                      </span>
+                    )}
+                  />
+                </div>
+                <div className="flex items-center justify-center border text-sm text-neutral-600 gap-3 w-full h-full py-5">
+                  <FaRegCalendarAlt />
+                  <DatePicker
+                    className="teal custom-rmdp"
+                    numberOfMonths={2}
+                    showOtherDays={true}
+                    value={exitDate}
+                    onChange={handleExitDateChange}
+                    calendar={persian}
+                    locale={persian_fa}
+                    calendarPosition="bottom-center"
+                    minDate={entryDate || new DateObject({ calendar: persian })}
+                    format="dddd DD MMMM"
+                    portal={false}
+                    offsetY={15}
+                    render={(value, openCalendar) => (
+                      <span onClick={openCalendar} className="cursor-pointer">
+                        {exitDate ? exitDate.format("dddd DD MMMM") : "تاریخ خروج"}
+                      </span>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded overflow-hidden border p-2 mx-2">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-sm">بزرگسال (بالای ۱۲ سال)</p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setAdults(Math.max(1, adults - 1))}
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm">{toPersianNum(adults)}</span>
+                  <button
+                    onClick={() => setAdults(adults + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-sm">کودک (۲ تا ۱۲ سال)</p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setChildren(Math.max(0, children - 1))}
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm">{toPersianNum(children)}</span>
+                  <button
+                    onClick={() => setChildren(children + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button className="w-full bg-black rounded text-white py-2">
+              انتخاب تاریخ رزرو
+            </button>
+          </div>
+        </div>
+
+        <div className="h-px w-full bg-neutral-400 mt-16" />
+
+        {/* SIMILAR VILLAS SECTION START */}
+        <div className="space-y-5 mt-8">
+          <h2 className="font-bold text-xl">ویلا های مشابه</h2>
+          <Swiper
+            dir="rtl"
+            slidesPerView={3}
+            spaceBetween={24}
+            breakpoints={{
+              0: { slidesPerView: 1 },
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+            className="mySwiper"
+          >
+            {similarVillas.map((villa) => (
+              <SwiperSlide key={villa.id}>
+                <Link to={`/villa/${villa.id}`} className="border rounded-xl overflow-hidden shadow-md hover:shadow-lg transition block bg-white">
+                  <img
+                    src={villa.image}
+                    alt={villa.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4 space-y-2">
+                    <p className="flex items-center gap-2 text-base font-light">
+                      <FaStar size={18} className="text-yellow-400" />
+                      {toPersianNum(villa.rating)} ({toPersianNum(villa.reviews)} دیدگاه)
+                    </p>
+                    <h3 className="font-bold text-lg">{villa.name}</h3>
+                    <p className="text-xs text-gray-500">
+                      {villa.location} . هر واحد {toPersianNum(villa.unitCapacity)} نفر ظرفیت {toPersianNum(villa.units)} واحد
+                    </p>
+                    <p className="text-sm">
+                      {toPersianPrice(villa.price)} تومان / هرشب
+                    </p>
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+        {/* SIMILAR VILLAS SECTION END */}
+      </div>
+
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh] flex flex-col items-center">
+            <button
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 p-2 rounded-full hover:bg-opacity-75 transition"
+              onClick={closeModal}
+            >
+              <FaTimes size={24} />
+            </button>
+            <img
+              src={images[selectedIndex]}
+              alt=""
+              className="w-[80vw] h-[80vh] object-contain rounded-lg shadow-2xl"
+            />
+            <div className="absolute inset-0 flex items-center justify-between px-4">
+              <button
+                className="text-white bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-75 transition"
+                onClick={(e) => { e.stopPropagation(); nextImage(); }}
+              >
+                <FaArrowRight size={28} />
+              </button>
+              <button
+                className="text-white bg-black bg-opacity-50 p-3 rounded-full hover:bg-opacity-75 transition"
+                onClick={(e) => { e.stopPropagation(); prevImage(); }}
+              >
+                <FaArrowLeft size={28} />
+              </button>
+            </div>
+            <div className="text-white mt-2 text-sm">
+              {selectedIndex + 1} / {images.length}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  )
+}
+
+export default House
