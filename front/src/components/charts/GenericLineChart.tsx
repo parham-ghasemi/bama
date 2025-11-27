@@ -20,5 +20,3 @@ const GenericLineChart = ({ data, dataKey, title }: ChartProps) => {
 };
 
 export default GenericLineChart;
-
-// Create similar for BarChart using BarChart from recharts, e.g., GenericBarChart.tsx

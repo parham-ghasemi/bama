@@ -2,14 +2,12 @@ import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/App/ScrollToTop";
 
-// Public pages
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
 import City from "./pages/city/City";
 import FAQ from "./pages/faq/FAQ";
 import House from "./pages/house/House";
 
-// Admin pages
 import AdminLayout from "./layout/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
@@ -37,7 +35,7 @@ export default function App() {
 
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route index element={<Dashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="users/:id" element={<UserDetail />} />
 
