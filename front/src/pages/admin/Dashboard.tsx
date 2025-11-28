@@ -15,43 +15,43 @@ import { Calendar } from 'lucide-react'; // Added for bookings icon
 
 // Enhanced stats with icons for better visual appeal
 const dashboardStats = [
-  { title: 'تعداد رزروهای ماه جاری', value: '120', icon: <Home className="h-4 w-4 text-blue-500" /> },
+  { title: 'تعداد رزروهای ماه جاری', value: '120', icon: <Home className="h-4 w-4 text-blue-500" />, isPrice: false },
   { title: 'درآمد کل ماه جاری', value: '500,000,000', icon: <DollarSign className="h-4 w-4 text-green-500" />, isPrice: true },
-  { title: 'تعداد کاربران ثبت‌نام شده', value: '1,500', icon: <Users className="h-4 w-4 text-purple-500" /> },
+  { title: 'تعداد کاربران ثبت‌نام شده', value: '1,500', icon: <Users className="h-4 w-4 text-purple-500" />, isPrice: false },
   // { title: 'تعداد ویلاهای فعال', value: '300', icon: <Home className="h-4 w-4 text-orange-500" /> },
   // { title: 'تعداد ویلاهای در انتظار تایید', value: '50', icon: <Bell className="h-4 w-4 text-yellow-500" /> },
-  { title: 'درصد رشد نسبت به ماه قبل', value: '+15%', icon: <TrendingUp className="h-4 w-4 text-red-500" /> },
+  { title: 'درصد رشد نسبت به ماه قبل', value: '+15%', icon: <TrendingUp className="h-4 w-4 text-red-500" />, isPrice: false },
 ];
 
 // Sample data for charts (expanded for demo)
 const revenueData = [
-  { month: 'فروردین', value: 4000 },
-  { month: 'اردیبهشت', value: 5000 },
-  { month: 'خرداد', value: 6000 },
-  { month: 'تیر', value: 7000 },
-  { month: 'مرداد', value: 8000 },
-  { month: 'شهریور', value: 9000 },
-  { month: 'مهر', value: 10000 },
-  { month: 'آبان', value: 11000 },
-  { month: 'آذر', value: 12000 },
-  { month: 'دی', value: 13000 },
-  { month: 'بهمن', value: 14000 },
-  { month: 'اسفند', value: 15000 },
+  { name: 'فروردین', value: 4000 },
+  { name: 'اردیبهشت', value: 5000 },
+  { name: 'خرداد', value: 6000 },
+  { name: 'تیر', value: 7000 },
+  { name: 'مرداد', value: 8000 },
+  { name: 'شهریور', value: 9000 },
+  { name: 'مهر', value: 10000 },
+  { name: 'آبان', value: 11000 },
+  { name: 'آذر', value: 12000 },
+  { name: 'دی', value: 13000 },
+  { name: 'بهمن', value: 14000 },
+  { name: 'اسفند', value: 15000 },
 ];
 
 const bookingsData = [
-  { month: 'فروردین', value: 100 },
-  { month: 'اردیبهشت', value: 120 },
-  { month: 'خرداد', value: 140 },
-  { month: 'تیر', value: 160 },
-  { month: 'مرداد', value: 180 },
-  { month: 'شهریور', value: 200 },
-  { month: 'مهر', value: 220 },
-  { month: 'آبان', value: 240 },
-  { month: 'آذر', value: 260 },
-  { month: 'دی', value: 280 },
-  { month: 'بهمن', value: 300 },
-  { month: 'اسفند', value: 320 },
+  { name: 'فروردین', value: 100 },
+  { name: 'اردیبهشت', value: 120 },
+  { name: 'خرداد', value: 140 },
+  { name: 'تیر', value: 160 },
+  { name: 'مرداد', value: 180 },
+  { name: 'شهریور', value: 200 },
+  { name: 'مهر', value: 220 },
+  { name: 'آبان', value: 240 },
+  { name: 'آذر', value: 260 },
+  { name: 'دی', value: 280 },
+  { name: 'بهمن', value: 300 },
+  { name: 'اسفند', value: 320 },
 ];
 
 const locationsData = [
@@ -63,18 +63,18 @@ const locationsData = [
 ];
 
 const userGrowthData = [
-  { month: 'فروردین', value: 200 },
-  { month: 'اردیبهشت', value: 250 },
-  { month: 'خرداد', value: 300 },
-  { month: 'تیر', value: 350 },
-  { month: 'مرداد', value: 400 },
-  { month: 'شهریور', value: 450 },
-  { month: 'مهر', value: 500 },
-  { month: 'آبان', value: 550 },
-  { month: 'آذر', value: 600 },
-  { month: 'دی', value: 650 },
-  { month: 'بهمن', value: 700 },
-  { month: 'اسفند', value: 750 },
+  { name: 'فروردین', value: 200 },
+  { name: 'اردیبهشت', value: 250 },
+  { name: 'خرداد', value: 300 },
+  { name: 'تیر', value: 350 },
+  { name: 'مرداد', value: 400 },
+  { name: 'شهریور', value: 450 },
+  { name: 'مهر', value: 500 },
+  { name: 'آبان', value: 550 },
+  { name: 'آذر', value: 600 },
+  { name: 'دی', value: 650 },
+  { name: 'بهمن', value: 700 },
+  { name: 'اسفند', value: 750 },
 ];
 
 // Define columns for recent bookings
@@ -134,9 +134,6 @@ const listingColumns: ColumnDef<Listing>[] = [
 ];
 
 const Dashboard = () => {
-  // Map bookingsData to match GenericBarChart's expected data shape
-  const mappedBookingsData = bookingsData.map(({ month, value }) => ({ name: month, value }));
-
   // Get recent data (assuming higher id means more recent; adjust sorting if there's a date field)
   const recentBookings = [...bookings]
     .sort((a, b) => (b.id > a.id ? 1 : -1))
@@ -211,7 +208,7 @@ const Dashboard = () => {
               <CardTitle className="text-xl font-semibold text-gray-800">تعداد رزروها در ۱۲ ماه</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <GenericBarChart data={mappedBookingsData} dataKey="value" title="" className="h-[300px]" />
+              <GenericBarChart data={bookingsData} dataKey="value" title="" className="h-[300px]" />
             </CardContent>
           </Card>
         </TabsContent>

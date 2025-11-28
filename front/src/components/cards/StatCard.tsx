@@ -3,15 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 interface StatCardProps {
   title: string;
   value: string;
+  icon?: React.ReactNode;
   growth?: string;
-  isPrice: boolean
+  isPrice?: boolean;
+  className?: string;
 }
 
-const StatCard = ({ title, value, growth, isPrice }: StatCardProps) => {
+const StatCard = ({ title, value, icon, growth, isPrice = false, className = '' }: StatCardProps) => {
   return (
-    <Card className='py-8'>
-      <CardHeader>
+    <Card className={`py-8 ${className}`}>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
+        {icon}
       </CardHeader>
       <CardContent>
         <p className="text-3xl font-bold text-end">

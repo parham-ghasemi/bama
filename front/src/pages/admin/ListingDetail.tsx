@@ -10,7 +10,7 @@ const ListingDetail = () => {
   const listing = listings.find((l) => l.id === id);
   if (!listing) return <p>ویلا یافت نشد</p>;
 
-  const trendData = [{ month: 'فروردین', bookings: 5 }, /* fake */];
+  const trendData = [{ name: 'فروردین', value: 5 }, /* fake */];
 
   return (
     <div className="space-y-6">
@@ -36,7 +36,7 @@ const ListingDetail = () => {
       </Card>
       <Card>
         <CardHeader><CardTitle>روند رزرو</CardTitle></CardHeader>
-        <CardContent><GenericLineChart data={trendData} dataKey="bookings" title="" /></CardContent>
+        <CardContent><GenericLineChart data={trendData} dataKey="value" title="" /></CardContent>
       </Card>
       <div className="flex gap-4">
         <Button>تایید</Button>
