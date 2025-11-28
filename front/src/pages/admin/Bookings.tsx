@@ -1,3 +1,4 @@
+// Bookings.tsx
 import { type ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '../../components/ui/data-table'; // Assuming shadcn DataTable
 import { bookings } from '../../data/bookings';
@@ -6,6 +7,14 @@ import { listings } from '../../data/listings';
 import { users } from '../../data/users';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 
 const columns: ColumnDef<Booking>[] = [
   {
@@ -50,6 +59,20 @@ const Bookings = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">مدیریت رزروها</h2>
+      <div className="flex items-center space-x-4 rtl:space-x-reverse">
+        <Input placeholder="جستجو..." className="max-w-sm" />
+        <Select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="وضعیت" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">همه</SelectItem>
+            <SelectItem value="confirmed">تایید شده</SelectItem>
+            <SelectItem value="pending">در حال بررسی</SelectItem>
+            <SelectItem value="cancelled">لغو شده</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <DataTable columns={columns} data={bookings} />
     </div>
   );

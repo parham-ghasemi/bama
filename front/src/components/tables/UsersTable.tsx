@@ -25,5 +25,3 @@ const UsersTable = () => {
 };
 
 export default UsersTable;
-
-// Create similar tables for ListingsTable, BookingsTable, ReportsTable, etc., by adapting columns and data.

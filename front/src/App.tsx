@@ -15,7 +15,6 @@ import UserDetail from "./pages/admin/UserDetail";
 import Listings from "./pages/admin/Listings";
 import ListingDetail from "./pages/admin/ListingDetail";
 import Bookings from "./pages/admin/Bookings";
-import Reports from "./pages/admin/Reports";
 import Finance from "./pages/admin/Finance";
 
 export default function App() {
@@ -44,12 +43,11 @@ export default function App() {
 
             <Route path="bookings" element={<Bookings />} />
 
-            <Route path="reports" element={<Reports />} />
             <Route path="finance" element={<Finance />} />
           </Route>
 
           {/* Redirect any unknown route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </BrowserRouter>
     </div>

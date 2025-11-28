@@ -1,9 +1,12 @@
-import { motion, AnimatePresence } from "framer-motion"; import { IoMdExit } from "react-icons/io";
+import { motion, AnimatePresence } from "framer-motion";
+import { IoMdExit } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const AuthModal = ({ isAuthModalOpen, setIsAuthModalOpen, origin }: { isAuthModalOpen: boolean, setIsAuthModalOpen: (is: boolean) => void, origin: { x: number, y: number } }) => {
 
   const nav = useNavigate();
+  const [phone, setPhone] = useState('');
 
   const variants = {
     initial: { clipPath: `circle(0% at ${origin.x}% ${origin.y}%)` },
@@ -14,6 +17,19 @@ const AuthModal = ({ isAuthModalOpen, setIsAuthModalOpen, origin }: { isAuthModa
   const handleOutsideClick = (event: React.MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) {
       setIsAuthModalOpen(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhone(value);
+  };
+
+  const handleButtonClick = () => {
+    if (phone === "000") {
+      nav('/admin');
+    } else {
+      nav('/');
     }
   };
 
@@ -38,10 +54,16 @@ const AuthModal = ({ isAuthModalOpen, setIsAuthModalOpen, origin }: { isAuthModa
                 <p className="text-2xl font-black">ورود یا ثبت نام در باما</p>
                 <p className="text-2xl font-light mt-2"> برای ورود به باما شماره همراه خود را وارد کنید.  </p>
                 <div className="flex flex-col gap-3">
-                  <input type="text" className="h-12 outline outline-gray-500 w-80 rounded-xl text-center mt-4" placeholder="09XXXXXXXXXX" />
+                  <input
+                    type="text"
+                    className="h-12 outline outline-gray-500 w-80 rounded-xl text-center mt-4"
+                    placeholder="09XXXXXXXXXX"
+                    value={phone}
+                    onChange={handleInputChange}
+                  />
                   <span className="text-xs text-red-500">شماره موبایل خود را وارد کنید </span>
                 </div>
-                <button className="bg-[#2D3357] text-center w-80 text-blue-50 py-2 rounded-xl hover:brightness-105 cursor-pointer font-bold text-base" onClick={() => nav('/')}> ادامه </button>
+                <button className="bg-[#2D3357] text-center w-80 text-blue-50 py-2 rounded-xl hover:brightness-105 cursor-pointer font-bold text-base" onClick={handleButtonClick}> ادامه </button>
               </div>
             </div>
           </motion.div>

@@ -76,5 +76,3 @@ export function DataTable<TData, TValue>({
     </div>
   )
 }
-
-// This is a basic version; you can add pagination, sorting, etc., as needed.
