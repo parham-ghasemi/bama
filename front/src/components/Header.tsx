@@ -5,6 +5,7 @@ import persian from "react-date-object/calendars/persian"
 import persian_fa from "react-date-object/locales/persian_fa"
 import "react-multi-date-picker/styles/colors/teal.css"
 import { cities } from "./cities"  // Import the cities list
+import { useNavigate } from "react-router-dom";
 
 const options = [
   {
@@ -42,6 +43,7 @@ const Header = () => {
   const headerRef = useRef<HTMLDivElement>(null);
   const entryDatePickerRef = useRef<any>(null);
   const exitDatePickerRef = useRef<any>(null);
+  const navigate = useNavigate();
 
   // Compute filtered cities for suggestions
   const filteredCities = search
@@ -93,6 +95,12 @@ const Header = () => {
       setActive(active === 3 ? undefined : 3);
       entryDatePickerRef.current.closeCalendar();
       exitDatePickerRef.current.closeCalendar();
+    }
+  };
+
+  const handleSearch = () => {
+    if (search) {
+      navigate(`/villa-results/${encodeURIComponent(search)}`);
     }
   };
 
@@ -278,7 +286,7 @@ const Header = () => {
           )}
         </div>
       ))}
-      <div className="h-12 w-12 bg-[#2891C3] group-hover:brightness-110 hover:brightness-125 rounded-full hover:scale-105 transition cursor-pointer flex items-center justify-center ">
+      <div onClick={handleSearch} className="h-12 w-12 bg-[#2891C3] group-hover:brightness-110 hover:brightness-125 rounded-full hover:scale-105 transition cursor-pointer flex items-center justify-center ">
         <IoSearchOutline className="text-blue-50" size={24} />
       </div>
     </div>

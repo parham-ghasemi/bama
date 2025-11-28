@@ -16,6 +16,7 @@ import Listings from "./pages/admin/Listings";
 import ListingDetail from "./pages/admin/ListingDetail";
 import Bookings from "./pages/admin/Bookings";
 import Finance from "./pages/admin/Finance";
+import VillaResults from "./pages/villaResults/VillaResults";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/city" element={<City />} />
           <Route path="/house" element={<House />} />
+          <Route path="/villa-results/:city" element={<VillaResults />} />
           <Route path="/faq" element={<FAQ />} />
 
           {/* Admin routes */}
