@@ -5,6 +5,9 @@ import { listings } from '../../data/listings';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 // Import tables for user's bookings, listings, payments, reports
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const UserDetail = () => {
   const { id } = useParams();
@@ -23,7 +26,7 @@ const UserDetail = () => {
         <CardContent>
           <p>ایمیل: {user.email}</p>
           <p>شماره: {user.phone}</p>
-          <p>تاریخ ثبت: {user.registrationDate.toLocaleDateString('fa-IR')}</p>
+          <p>تاریخ ثبت: {new DateObject({ date: user.registrationDate, calendar: persian, locale: persian_fa }).format("YYYY/MM/DD")}</p>
           <p>وضعیت: {user.status}</p>
         </CardContent>
       </Card>

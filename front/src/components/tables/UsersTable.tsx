@@ -2,6 +2,9 @@ import { type ColumnDef } from '@tanstack/react-table'; // assuming shadcn table
 import { DataTable } from '../../components/ui/data-table';
 import { type User } from '../../data/types';
 import { users } from '../../data/users';
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const columns: ColumnDef<User>[] = [
   { accessorKey: 'name', header: 'نام' },
@@ -13,7 +16,7 @@ const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'registrationDate',
     header: 'تاریخ ثبت‌نام',
-    cell: ({ row }) => row.original.registrationDate.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.registrationDate, calendar: persian, locale: persian_fa }).format("YYYY/MM/DD"),
   },
   { accessorKey: 'bookingsCount', header: 'تعداد رزرو' },
   { accessorKey: 'listingsCount', header: 'تعداد ویلاهای ثبت شده' },

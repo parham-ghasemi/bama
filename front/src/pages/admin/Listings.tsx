@@ -14,6 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const columns: ColumnDef<Listing>[] = [
   { accessorKey: 'name', header: 'نام ویلا' },
@@ -33,7 +36,7 @@ const columns: ColumnDef<Listing>[] = [
   {
     accessorKey: 'submissionDate',
     header: 'تاریخ ارسال',
-    cell: ({ row }) => row.original.submissionDate.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.submissionDate, calendar: persian, locale: persian_fa }).format("YYYY/MM/DD"),
   },
   { accessorKey: 'status', header: 'وضعیت' },
   {

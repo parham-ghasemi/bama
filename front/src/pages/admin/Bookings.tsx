@@ -15,6 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const columns: ColumnDef<Booking>[] = [
   {
@@ -36,12 +39,12 @@ const columns: ColumnDef<Booking>[] = [
   {
     accessorKey: 'checkIn',
     header: 'تاریخ ورود',
-    cell: ({ row }) => row.original.checkIn.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.checkIn, calendar: persian, locale: persian_fa }).format("YYYY/MM/DD"),
   },
   {
     accessorKey: 'checkOut',
     header: 'تاریخ خروج',
-    cell: ({ row }) => row.original.checkOut.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.checkOut, calendar: persian, locale: persian_fa }).format("YYYY/MM/DD"),
   },
   { accessorKey: 'amount', header: 'مبلغ' },
   { accessorKey: 'status', header: 'وضعیت' },
