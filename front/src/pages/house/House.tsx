@@ -89,6 +89,32 @@ const House = () => {
     }
   ];
 
+  // Fake occupied dates (using Persian calendar dates, e.g., assuming current year/month for demo)
+  const occupiedDates = [
+    new DateObject({ calendar: persian, year: 1404, month: 9, day: 10 }),
+    new DateObject({ calendar: persian, year: 1404, month: 9, day: 15 }),
+    new DateObject({ calendar: persian, year: 1404, month: 9, day: 20 }),
+    new DateObject({ calendar: persian, year: 1404, month: 10, day: 1 }),
+    new DateObject({ calendar: persian, year: 1404, month: 10, day: 2 }),
+    new DateObject({ calendar: persian, year: 1404, month: 10, day: 5 }),
+  ];
+
+  const mapDays = ({ date }: { date: DateObject }) => {
+    if (occupiedDates.some(occ => occ.year === date.year && occ.month.number === date.month.number && occ.day === date.day)) {
+      return {
+        disabled: true,
+        className: 'text-gray-500 cursor-not-allowed',
+        title: 'ویلا در این تاریخ اشغال شده است',
+        children: (
+          <div className="relative w-full h-full flex items-center justify-center">
+            {date.format('D')}
+            <div className="absolute w-[70%] h-[2px] bg-red-500 transform -rotate-45" />
+          </div>
+        ),
+      };
+    }
+  };
+
   const openModal = (index: number) => {
     setSelectedIndex(index);
     setIsModalOpen(true);
@@ -303,6 +329,7 @@ const House = () => {
                     format="dddd DD MMMM"
                     portal={false}
                     offsetY={15}
+                    mapDays={mapDays}
                     render={(value, openCalendar) => (
                       <span onClick={openCalendar} className="cursor-pointer">
                         {entryDate ? entryDate.format("dddd DD MMMM") : "تاریخ ورود"}
@@ -325,6 +352,7 @@ const House = () => {
                     format="dddd DD MMMM"
                     portal={false}
                     offsetY={15}
+                    mapDays={mapDays}
                     render={(value, openCalendar) => (
                       <span onClick={openCalendar} className="cursor-pointer">
                         {exitDate ? exitDate.format("dddd DD MMMM") : "تاریخ خروج"}
