@@ -142,6 +142,11 @@ const FAQ = () => {
       <h2 className="font-bold text-2xl w-3xl mt-14">
         {selectedCategory || "پرتکرار ترین پرسش ها"}
       </h2>
+      {searchTerm && (
+        <p className="w-3xl mt-2 text-neutral-600">
+          {filteredQuestions.length === 0 ? "هیچ نتیجه‌ای یافت نشد" : `${filteredQuestions.length} نتیجه یافت شد`}
+        </p>
+      )}
       <div className="w-3xl mt-4 flex flex-col gap-2">
         {filteredQuestions.map((qa, index) => (
           <Question q={qa.q} a={qa.a} searchTerms={terms} key={`question${index}`} />
