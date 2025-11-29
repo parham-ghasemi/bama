@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   phone: string;
-  registrationDate: Date;
+  registrationDate: string;
   bookingsCount: number;
   listingsCount: number;
   status: 'active' | 'blocked';
@@ -15,7 +15,7 @@ export interface Listing {
   ownerId: string;
   province: string;
   city: string;
-  submissionDate: Date;
+  submissionDate: string;
   status: 'pending' | 'approved' | 'rejected' | 'disabled';
   description: string;
   amenities: string[];
@@ -29,8 +29,8 @@ export interface Booking {
   id: string;
   listingId: string;
   userId: string;
-  checkIn: Date;
-  checkOut: Date;
+  checkIn: string;
+  checkOut: string;
   amount: number;
   status: 'paid' | 'pending' | 'cancelled' | 'refunded';
 }

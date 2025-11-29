@@ -1,5 +1,5 @@
 // src/pages/admin/Finance.tsx (or wherever it is)
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import GenericLineChart from '../../components/charts/GenericLineChart';
 import GenericBarChart from '../../components/charts/GenericBarChart';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -15,29 +15,66 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { FiPrinter, FiCalendar } from 'react-icons/fi'; // Using feather icons from react-icons
 
 import { revenueData, payoutData, financialRecords } from '../../data/finance';
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import gregorian from "react-date-object/calendars/gregorian";
+import "react-multi-date-picker/styles/colors/teal.css";
 
 const Finance = () => {
   const [timeFrame, setTimeFrame] = useState('all');
+  const [startDate, setStartDate] = useState<DateObject | null>(null);
+  const [endDate, setEndDate] = useState<DateObject | null>(null);
+  const startDatePickerRef = useRef<any>(null);
+  const endDatePickerRef = useRef<any>(null);
 
   const timeFrameLabels = {
     month: 'ماه گذشته',
     year: 'سال گذشته',
     all: 'همه زمان‌ها',
+    custom: 'بازه دلخواه',
   };
 
   const getFilteredData = (data: any[]) => {
     const now = new Date();
-    let startDate: Date | null = null;
+    let startFilter: Date | null = null;
+    let endFilter: Date = now;
 
-    if (timeFrame === 'month') {
-      startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-    } else if (timeFrame === 'year') {
-      startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    if (timeFrame === 'custom') {
+      if (!startDate || !endDate) return data;
+      const startGreg = startDate.convert(gregorian).toDate();
+      const endGreg = endDate.convert(gregorian).toDate();
+      return data.filter((item) => {
+        const itemDateObj = new DateObject({ date: item.date, calendar: persian, format: "YYYY-MM-DD" });
+        const itemGreg = itemDateObj.convert(gregorian).toDate();
+        return itemGreg >= startGreg && itemGreg <= endGreg;
+      });
+    } else {
+      if (timeFrame === 'month') {
+        startFilter = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else if (timeFrame === 'year') {
+        startFilter = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      }
+
+      if (!startFilter) return data;
+
+      return data.filter((item) => {
+        const itemDateObj = new DateObject({ date: item.date, calendar: persian, format: "YYYY-MM-DD" });
+        const itemGreg = itemDateObj.convert(gregorian).toDate();
+        return itemGreg >= startFilter;
+      });
     }
+  };
 
-    if (!startDate) return data;
+  const handleStartDateChange = (date: DateObject | null) => {
+    setStartDate(date);
+    if (date && endDate && date.unix > endDate.unix) {
+      setEndDate(date.add(1, "day"));
+    }
+  };
 
-    return data.filter((item) => new Date(item.date) >= startDate);
+  const handleEndDateChange = (date: DateObject | null) => {
+    setEndDate(date);
   };
 
   const filteredRevenue = getFilteredData(revenueData);
@@ -68,6 +105,10 @@ const Finance = () => {
     const printWindow = window.open('', '', 'height=600,width=800');
     if (!printWindow) return;
 
+    const label = timeFrame === 'custom'
+      ? `بازه از ${startDate?.format("YYYY/MM/DD") ?? ''} تا ${endDate?.format("YYYY/MM/DD") ?? ''}`
+      : timeFrameLabels[timeFrame as keyof typeof timeFrameLabels];
+
     printWindow.document.write('<html><head><title>چاپ داده‌های مالی</title>');
     printWindow.document.write('<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">');
     printWindow.document.write('<style>');
@@ -79,7 +120,7 @@ const Finance = () => {
     printWindow.document.write('th { background-color: #f2f2f2; }');
     printWindow.document.write('</style></head><body>');
 
-    printWindow.document.write(`<h1>داده‌های مالی - ${timeFrameLabels[timeFrame as keyof typeof timeFrameLabels]}</h1>`);
+    printWindow.document.write(`<h1>داده‌های مالی - ${label}</h1>`);
     printWindow.document.write('<h2>خلاصه مالی</h2>');
     printWindow.document.write(`<p>درآمد کل: ${totalRevenue.toLocaleString('fa-IR')} ریال</p>`);
     printWindow.document.write(`<p>کارمزد پلتفرم: ${platformFee.toLocaleString('fa-IR')} ریال</p>`);
@@ -139,9 +180,57 @@ const Finance = () => {
               <SelectItem value="month">ماه گذشته</SelectItem>
               <SelectItem value="year">سال گذشته</SelectItem>
               <SelectItem value="all">همه زمان‌ها</SelectItem>
+              <SelectItem value="custom">بازه دلخواه</SelectItem>
             </SelectContent>
           </Select>
         </div>
+        {timeFrame === 'custom' && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <FiCalendar className="text-gray-600" size={20} />
+            <DatePicker
+              ref={startDatePickerRef}
+              className="teal"
+              numberOfMonths={2}
+              showOtherDays={true}
+              value={startDate}
+              onChange={handleStartDateChange}
+              calendar={persian}
+              locale={persian_fa}
+              calendarPosition="bottom-center"
+              minDate={new DateObject({ calendar: persian }).set("year", 1401)}
+              maxDate={endDate}
+              format="dddd DD MMMM"
+              render={(value, openCalendar) => (
+                <p onClick={openCalendar} className="text-sm text-gray-800 font-light cursor-pointer">
+                  {startDate ? startDate.format("dddd DD MMMM") : "تاریخ شروع"}
+                </p>
+              )}
+            />
+          </div>
+        )}
+        {timeFrame === 'custom' && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <FiCalendar className="text-gray-600" size={20} />
+            <DatePicker
+              ref={endDatePickerRef}
+              className="teal"
+              numberOfMonths={2}
+              showOtherDays={true}
+              value={endDate}
+              onChange={handleEndDateChange}
+              calendar={persian}
+              locale={persian_fa}
+              calendarPosition="bottom-center"
+              minDate={startDate || new DateObject({ calendar: persian })}
+              format="dddd DD MMMM"
+              render={(value, openCalendar) => (
+                <p onClick={openCalendar} className="text-sm text-gray-800 font-light cursor-pointer">
+                  {endDate ? endDate.format("dddd DD MMMM") : "تاریخ پایان"}
+                </p>
+              )}
+            />
+          </div>
+        )}
         <Button onClick={handlePrint} className="w-full sm:w-auto">
           <FiPrinter className="mr-2" size={16} />
           چاپ داده‌ها

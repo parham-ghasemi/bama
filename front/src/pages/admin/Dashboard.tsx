@@ -12,70 +12,20 @@ import { type Booking, type User, type Listing } from '../../data/types';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Button } from '../../components/ui/button';
 import { Calendar } from 'lucide-react'; // Added for bookings icon
-
-// Enhanced stats with icons for better visual appeal
-const dashboardStats = [
-  { title: 'تعداد رزروهای ماه جاری', value: '120', icon: <Home className="h-4 w-4 text-blue-500" />, isPrice: false },
-  { title: 'درآمد کل ماه جاری', value: '500,000,000', icon: <DollarSign className="h-4 w-4 text-green-500" />, isPrice: true },
-  { title: 'تعداد کاربران ثبت‌نام شده', value: '1,500', icon: <Users className="h-4 w-4 text-purple-500" />, isPrice: false },
-  // { title: 'تعداد ویلاهای فعال', value: '300', icon: <Home className="h-4 w-4 text-orange-500" /> },
-  // { title: 'تعداد ویلاهای در انتظار تایید', value: '50', icon: <Bell className="h-4 w-4 text-yellow-500" /> },
-  { title: 'درصد رشد نسبت به ماه قبل', value: '+15%', icon: <TrendingUp className="h-4 w-4 text-red-500" />, isPrice: false },
-];
-
-// Sample data for charts (expanded for demo)
-const revenueData = [
-  { name: 'فروردین', value: 4000 },
-  { name: 'اردیبهشت', value: 5000 },
-  { name: 'خرداد', value: 6000 },
-  { name: 'تیر', value: 7000 },
-  { name: 'مرداد', value: 8000 },
-  { name: 'شهریور', value: 9000 },
-  { name: 'مهر', value: 10000 },
-  { name: 'آبان', value: 11000 },
-  { name: 'آذر', value: 12000 },
-  { name: 'دی', value: 13000 },
-  { name: 'بهمن', value: 14000 },
-  { name: 'اسفند', value: 15000 },
-];
-
-const bookingsData = [
-  { name: 'فروردین', value: 100 },
-  { name: 'اردیبهشت', value: 120 },
-  { name: 'خرداد', value: 140 },
-  { name: 'تیر', value: 160 },
-  { name: 'مرداد', value: 180 },
-  { name: 'شهریور', value: 200 },
-  { name: 'مهر', value: 220 },
-  { name: 'آبان', value: 240 },
-  { name: 'آذر', value: 260 },
-  { name: 'دی', value: 280 },
-  { name: 'بهمن', value: 300 },
-  { name: 'اسفند', value: 320 },
-];
-
-const locationsData = [
-  { name: 'مازندران', value: 150 },
-  { name: 'گیلان', value: 120 },
-  { name: 'تهران', value: 80 },
-  { name: 'اصفهان', value: 60 },
-  { name: 'شیراز', value: 40 },
-];
-
-const userGrowthData = [
-  { name: 'فروردین', value: 200 },
-  { name: 'اردیبهشت', value: 250 },
-  { name: 'خرداد', value: 300 },
-  { name: 'تیر', value: 350 },
-  { name: 'مرداد', value: 400 },
-  { name: 'شهریور', value: 450 },
-  { name: 'مهر', value: 500 },
-  { name: 'آبان', value: 550 },
-  { name: 'آذر', value: 600 },
-  { name: 'دی', value: 650 },
-  { name: 'بهمن', value: 700 },
-  { name: 'اسفند', value: 750 },
-];
+import { useState, useRef } from 'react';
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import gregorian from "react-date-object/calendars/gregorian";
+import "react-multi-date-picker/styles/colors/teal.css";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
+import { FiCalendar } from 'react-icons/fi';
 
 // Define columns for recent bookings
 const bookingColumns: ColumnDef<Booking>[] = [
@@ -98,12 +48,12 @@ const bookingColumns: ColumnDef<Booking>[] = [
   {
     accessorKey: 'checkIn',
     header: 'تاریخ ورود',
-    cell: ({ row }) => row.original.checkIn.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.checkIn, calendar: persian, locale: persian_fa }).format("dddd DD MMMM"),
   },
   {
     accessorKey: 'checkOut',
     header: 'تاریخ خروج',
-    cell: ({ row }) => row.original.checkOut.toLocaleDateString('fa-IR'),
+    cell: ({ row }) => new DateObject({ date: row.original.checkOut, calendar: persian, locale: persian_fa }).format("dddd DD MMMM"),
   },
   { accessorKey: 'amount', header: 'مبلغ' },
   { accessorKey: 'status', header: 'وضعیت' },
@@ -116,7 +66,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: 'registrationDate',
     header: 'تاریخ ثبت‌نام',
-    cell: ({ row }) => row.original.registrationDate?.toLocaleDateString('fa-IR') || 'نامشخص',
+    cell: ({ row }) => new DateObject({ date: row.original.registrationDate, calendar: persian, locale: persian_fa }).format("dddd DD MMMM"),
   },
 ];
 
@@ -127,24 +77,145 @@ const listingColumns: ColumnDef<Listing>[] = [
   { accessorKey: 'price', header: 'قیمت' },
   { accessorKey: 'status', header: 'وضعیت' },
   {
-    accessorKey: 'id',
-    header: 'شناسه',
-    cell: ({ row }) => row.original.id,
+    accessorKey: 'submissionDate',
+    header: 'تاریخ ارسال',
+    cell: ({ row }) => new DateObject({ date: row.original.submissionDate, calendar: persian, locale: persian_fa }).format("dddd DD MMMM"),
   },
 ];
 
 const Dashboard = () => {
-  // Get recent data (assuming higher id means more recent; adjust sorting if there's a date field)
-  const recentBookings = [...bookings]
-    .sort((a, b) => (b.id > a.id ? 1 : -1))
+  const [timeFrame, setTimeFrame] = useState('all');
+  const [startDate, setStartDate] = useState<DateObject | null>(null);
+  const [endDate, setEndDate] = useState<DateObject | null>(null);
+  const startDatePickerRef = useRef<any>(null);
+  const endDatePickerRef = useRef<any>(null);
+
+  const timeFrameLabels = {
+    month: 'ماه گذشته',
+    year: 'سال گذشته',
+    all: 'همه زمان‌ها',
+    custom: 'بازه دلخواه',
+  };
+
+  const getFilteredData = <T extends { [key: string]: any }>(data: T[], dateKey: keyof T) => {
+    const now = new Date();
+    let startFilter: Date | null = null;
+
+    if (timeFrame === 'custom') {
+      if (!startDate || !endDate) return data;
+      const startGreg = startDate.convert(gregorian).toDate();
+      const endGreg = endDate.convert(gregorian).toDate();
+      return data.filter((item) => {
+        const itemDateObj = new DateObject({ date: item[dateKey], calendar: persian });
+        const itemGreg = itemDateObj.convert(gregorian).toDate();
+        return itemGreg >= startGreg && itemGreg <= endGreg;
+      });
+    } else {
+      if (timeFrame === 'month') {
+        startFilter = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else if (timeFrame === 'year') {
+        startFilter = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      }
+
+      if (!startFilter) return data;
+
+      return data.filter((item) => {
+        const itemDateObj = new DateObject({ date: item[dateKey], calendar: persian });
+        const itemGreg = itemDateObj.convert(gregorian).toDate();
+        return itemGreg >= startFilter;
+      });
+    }
+  };
+
+  const handleStartDateChange = (date: DateObject | null) => {
+    setStartDate(date);
+    if (date && endDate && date.unix > endDate.unix) {
+      setEndDate(date.add(1, "day"));
+    }
+  };
+
+  const handleEndDateChange = (date: DateObject | null) => {
+    setEndDate(date);
+  };
+
+  const filteredBookings = getFilteredData(bookings, 'checkIn');
+  const filteredUsers = getFilteredData(users, 'registrationDate');
+  const filteredListings = getFilteredData(listings, 'submissionDate');
+
+  // Aggregate monthly revenue
+  const revenueMap = new Map<string, { value: number, unix: number }>();
+  for (const b of filteredBookings) {
+    const dateObj = new DateObject({ date: b.checkIn, calendar: persian });
+    const monthKey = dateObj.format("MMMM YYYY");
+    if (!revenueMap.has(monthKey)) {
+      revenueMap.set(monthKey, { value: 0, unix: dateObj.unix });
+    }
+    revenueMap.get(monthKey)!.value += b.amount;
+  }
+  const revenueData = Array.from(revenueMap, ([name, { value, unix }]) => ({ name, value, unix }))
+    .sort((a, b) => a.unix - b.unix)
+    .map(({ name, value }) => ({ name, value }));
+
+  // Aggregate monthly bookings count
+  const bookingsMap = new Map<string, { value: number, unix: number }>();
+  for (const b of filteredBookings) {
+    const dateObj = new DateObject({ date: b.checkIn, calendar: persian });
+    const monthKey = dateObj.format("MMMM YYYY");
+    if (!bookingsMap.has(monthKey)) {
+      bookingsMap.set(monthKey, { value: 0, unix: dateObj.unix });
+    }
+    bookingsMap.get(monthKey)!.value += 1;
+  }
+  const bookingsData = Array.from(bookingsMap, ([name, { value, unix }]) => ({ name, value, unix }))
+    .sort((a, b) => a.unix - b.unix)
+    .map(({ name, value }) => ({ name, value }));
+
+  // Aggregate locations count
+  const locationsMap = new Map<string, number>();
+  for (const l of filteredListings) {
+    const key = l.province;
+    locationsMap.set(key, (locationsMap.get(key) || 0) + 1);
+  }
+  const locationsData = Array.from(locationsMap, ([name, value]) => ({ name, value }));
+
+  // Aggregate monthly user growth
+  const userGrowthMap = new Map<string, { value: number, unix: number }>();
+  for (const u of filteredUsers) {
+    const dateObj = new DateObject({ date: u.registrationDate, calendar: persian });
+    const monthKey = dateObj.format("MMMM YYYY");
+    if (!userGrowthMap.has(monthKey)) {
+      userGrowthMap.set(monthKey, { value: 0, unix: dateObj.unix });
+    }
+    userGrowthMap.get(monthKey)!.value += 1;
+  }
+  const userGrowthData = Array.from(userGrowthMap, ([name, { value, unix }]) => ({ name, value, unix }))
+    .sort((a, b) => a.unix - b.unix)
+    .map(({ name, value }) => ({ name, value }));
+
+  // Calculate revenue growth
+  const revenueGrowth = revenueData.length > 1
+    ? ((revenueData[revenueData.length - 1].value - revenueData[0].value) / revenueData[0].value * 100).toFixed(2) + '%'
+    : '0%';
+
+  // Dashboard stats based on filtered data
+  const dashboardStats = [
+    { title: 'تعداد رزروها', value: filteredBookings.length.toString(), icon: <Home className="h-4 w-4 text-blue-500" />, isPrice: false },
+    { title: 'درآمد کل', value: filteredBookings.reduce((sum, b) => sum + b.amount, 0).toLocaleString('fa-IR'), icon: <DollarSign className="h-4 w-4 text-green-500" />, isPrice: true },
+    { title: 'تعداد کاربران ثبت‌نام شده', value: filteredUsers.length.toString(), icon: <Users className="h-4 w-4 text-purple-500" />, isPrice: false },
+    { title: 'درصد رشد نسبت به ماه قبل', value: revenueGrowth, icon: <TrendingUp className="h-4 w-4 text-red-500" />, isPrice: false },
+  ];
+
+  // Get recent data
+  const recentBookings = [...filteredBookings]
+    .sort((a, b) => new DateObject({ date: b.checkIn, calendar: persian }).unix - new DateObject({ date: a.checkIn, calendar: persian }).unix)
     .slice(0, 5);
 
-  const recentUsers = [...users]
-    .sort((a, b) => b.registrationDate.getTime() - a.registrationDate.getTime())
+  const recentUsers = [...filteredUsers]
+    .sort((a, b) => new DateObject({ date: b.registrationDate, calendar: persian }).unix - new DateObject({ date: a.registrationDate, calendar: persian }).unix)
     .slice(0, 5);
 
-  const recentListings = [...listings]
-    .sort((a, b) => (b.id > a.id ? 1 : -1))
+  const recentListings = [...filteredListings]
+    .sort((a, b) => new DateObject({ date: b.submissionDate, calendar: persian }).unix - new DateObject({ date: a.submissionDate, calendar: persian }).unix)
     .slice(0, 5);
 
   return (
@@ -154,6 +225,70 @@ const Dashboard = () => {
         <div className="flex items-center space-x-4">
           <Button className="bg-blue-600 hover:bg-blue-700">به‌روزرسانی داده‌ها</Button>
         </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <FiCalendar className="text-gray-600" size={20} />
+          <Select value={timeFrame} onValueChange={setTimeFrame}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="انتخاب بازه زمانی" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="month">ماه گذشته</SelectItem>
+              <SelectItem value="year">سال گذشته</SelectItem>
+              <SelectItem value="all">همه زمان‌ها</SelectItem>
+              <SelectItem value="custom">بازه دلخواه</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {timeFrame === 'custom' && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <FiCalendar className="text-gray-600" size={20} />
+            <DatePicker
+              ref={startDatePickerRef}
+              className="teal"
+              numberOfMonths={2}
+              showOtherDays={true}
+              value={startDate}
+              onChange={handleStartDateChange}
+              calendar={persian}
+              locale={persian_fa}
+              calendarPosition="bottom-center"
+              minDate={new DateObject({ calendar: persian }).set("year", 1401)}
+              maxDate={endDate}
+              format="dddd DD MMMM"
+              render={(value, openCalendar) => (
+                <p onClick={openCalendar} className="text-sm text-gray-800 font-light cursor-pointer">
+                  {startDate ? startDate.format("dddd DD MMMM") : "تاریخ شروع"}
+                </p>
+              )}
+            />
+          </div>
+        )}
+        {timeFrame === 'custom' && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <FiCalendar className="text-gray-600" size={20} />
+            <DatePicker
+              ref={endDatePickerRef}
+              className="teal"
+              numberOfMonths={2}
+              showOtherDays={true}
+              value={endDate}
+              onChange={handleEndDateChange}
+              calendar={persian}
+              locale={persian_fa}
+              calendarPosition="bottom-center"
+              minDate={startDate || new DateObject({ calendar: persian })}
+              format="dddd DD MMMM"
+              render={(value, openCalendar) => (
+                <p onClick={openCalendar} className="text-sm text-gray-800 font-light cursor-pointer">
+                  {endDate ? endDate.format("dddd DD MMMM") : "تاریخ پایان"}
+                </p>
+              )}
+            />
+          </div>
+        )}
       </div>
 
       {/* Stats grid with responsive layout and shadows */}
@@ -194,7 +329,7 @@ const Dashboard = () => {
         <TabsContent value="revenue">
           <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-white">
             <CardHeader className="bg-gray-50 border-b">
-              <CardTitle className="text-xl font-semibold text-gray-800">درآمد ۱۲ ماه گذشته</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-800">درآمد</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <GenericLineChart data={revenueData} dataKey="value" title="" className="h-[300px]" />
@@ -205,7 +340,7 @@ const Dashboard = () => {
         <TabsContent value="bookings">
           <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-white">
             <CardHeader className="bg-gray-50 border-b">
-              <CardTitle className="text-xl font-semibold text-gray-800">تعداد رزروها در ۱۲ ماه</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-800">تعداد رزروها</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <GenericBarChart data={bookingsData} dataKey="value" title="" className="h-[300px]" />
@@ -216,7 +351,7 @@ const Dashboard = () => {
         <TabsContent value="locations">
           <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-white">
             <CardHeader className="bg-gray-50 border-b">
-              <CardTitle className="text-xl font-semibold text-gray-800">تعداد ویلاها بر اساس استان/شهر</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-800">تعداد ویلاها بر اساس استان</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <GenericBarChart data={locationsData} dataKey="value" title="" className="h-[300px]" />
@@ -227,7 +362,7 @@ const Dashboard = () => {
         <TabsContent value="users">
           <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden bg-white">
             <CardHeader className="bg-gray-50 border-b">
-              <CardTitle className="text-xl font-semibold text-gray-800">رشد کاربران در ۱۲ ماه</CardTitle>
+              <CardTitle className="text-xl font-semibold text-gray-800">رشد کاربران</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <GenericLineChart data={userGrowthData} dataKey="value" title="" className="h-[300px]" />
