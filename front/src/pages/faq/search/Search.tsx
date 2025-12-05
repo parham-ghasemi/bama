@@ -1,6 +1,8 @@
+// Updated Search.tsx
 import { CiSearch } from "react-icons/ci";
 import { FaChevronDown } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Category = {
   title: string;
@@ -13,12 +15,14 @@ interface SearchProps {
   setSelectedCategory: (category: string | null) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  isRedirectSearch?: boolean;
 }
 
-const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelectedCategory, searchTerm, setSearchTerm }) => {
+const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelectedCategory, searchTerm, setSearchTerm, isRedirectSearch = false }) => {
   const allCategories = "همه دسته بندی ها";
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,6 +46,27 @@ const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelect
     ? `جست و جو در بین سوالات ${selectedCategory}`
     : 'جست و جو در بین سوالات';
 
+  const handleSearch = () => {
+    if (isRedirectSearch) {
+      const catParam = selectedCategory ? `category=${encodeURIComponent(selectedCategory)}&` : '';
+      const searchParam = searchTerm ? `search=${encodeURIComponent(searchTerm)}` : '';
+      const query = `?${catParam}${searchParam}`.replace(/&$/, '');
+      navigate(`/faq${query}`);
+    }
+  };
+
+  const handleCategorySelect = (title: string | null) => {
+    if (isRedirectSearch) {
+      const catParam = title ? `category=${encodeURIComponent(title)}&` : '';
+      const searchParam = searchTerm ? `search=${encodeURIComponent(searchTerm)}` : '';
+      const query = `?${catParam}${searchParam}`.replace(/&$/, '');
+      navigate(`/faq${query}`);
+    } else {
+      setSelectedCategory(title);
+    }
+    setOpen(false);
+  };
+
   return (
     <div className="rounded-lg px-7 py-3 border border-neutral-400 flex gap-5 items-center justify-between w-3xl">
       <div className="flex gap-3 items-center">
@@ -52,6 +77,11 @@ const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelect
           placeholder={placeholderText}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
         />
       </div>
 
@@ -63,8 +93,7 @@ const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelect
             className="px-3 py-1 cursor-pointer hover:bg-neutral-100"
             onClick={(e) => {
               e.stopPropagation();
-              setSelectedCategory(null);
-              setOpen(false);
+              handleCategorySelect(null);
             }}
           >
             {allCategories}
@@ -75,8 +104,7 @@ const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelect
               className="px-3 py-1 cursor-pointer hover:bg-neutral-100"
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedCategory(cat.title);
-                setOpen(false);
+                handleCategorySelect(cat.title);
               }}
             >
               {cat.title}
@@ -85,7 +113,10 @@ const Search: React.FC<SearchProps> = ({ categories, selectedCategory, setSelect
         </div>
       </div>
 
-      <button className="bg-neutral-800 rounded-lg p-1.5">
+      <button
+        className="bg-neutral-800 rounded-lg p-1.5"
+        onClick={handleSearch}
+      >
         <CiSearch size={25} className="text-white" />
       </button>
     </div>

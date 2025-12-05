@@ -1,7 +1,9 @@
+// Updated FAQ.tsx
 import Search from "./search/Search"
 import { useState, type ReactNode } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
+import { FaChevronDown, FaEye } from 'react-icons/fa';
 import Footer from "../../components/Footer";
+import { Link, useLocation } from 'react-router-dom';
 
 const categories = [
   { title: "میزبان", img: "/faq/guest-icon 1.svg" },
@@ -11,7 +13,7 @@ const categories = [
 
 const questions = [
   // دسته‌بندی میزبان
-  { q: "چگونه اقامتگاه خود را در سایت ثبت کنم؟", a: "برای ثبت اقامتگاه، ابتدا وارد حساب کاربری خود شوید، سپس به بخش 'میزبانی' بروید و فرم ثبت اقامتگاه را پر کنید. شامل عکس‌های باکیفیت، توضیحات دقیق و قوانین خانه باشید. پس از بررسی توسط تیم ما، اقامتگاه شما فعال می‌شود.", category: "میزبان" },
+  { q: "چگونه اقامتگاه خود را در سایت ثبت کنم؟", a: "برای ثبت اقامتگاه، ابتدا وارد حساب کاربری خود شوید، سپس به بخش 'میزبانی' بروید و فرم ثبت اقامتگاه را پر کنید. شامل عکس‌های باکیفیت، توضیحات دقیق و قوانین خانه باشید. پس از بررسی توسط تیم ما، اقامتگاه شما فعال می‌شود.", category: "میزبان", viewMoreBtn: true },
   { q: "پرداخت‌ها چگونه انجام می‌شود و چه زمانی وجه به حساب من واریز می‌گردد؟", a: "پرداخت‌ها از طریق درگاه بانکی امن انجام می‌شود. وجه رزرو پس از خروج میهمان و تایید عدم مشکل، ظرف ۴۸ ساعت به حساب بانکی شما واریز می‌گردد. کارمزد پلتفرم ۱۰% از مبلغ کل است.", category: "میزبان" },
   { q: "اگر میهمان قوانین خانه را رعایت نکند، چه کنم؟", a: "در صورت نقض قوانین، می‌توانید از طریق پنل میزبانی گزارش دهید. تیم پشتیبانی ما بررسی می‌کند و در صورت لزوم، جریمه یا لغو رزرو اعمال می‌شود. همچنین، بیمه اقامتگاه برای خسارات احتمالی پوشش می‌دهد.", category: "میزبان" },
   { q: "چگونه امتیاز و نظرات میهمانان را مدیریت کنم؟", a: "پس از هر رزرو، می‌توانید نظر خود را ثبت کنید. برای بهبود امتیاز، به تمیزی، ارتباط خوب و امکانات توجه کنید. نظرات منفی را با پاسخ حرفه‌ای مدیریت کنید تا اعتبار شما حفظ شود.", category: "میزبان" },
@@ -55,7 +57,7 @@ const highlightText = (text: string, terms: string[]): ReactNode[] => {
   return parts;
 };
 
-const Question = ({ q, a, searchTerms }: { q: string, a: string, searchTerms: string[] }) => {
+const Question = ({ q, a, searchTerms, viewMoreBtn }: { q: string, a: string, searchTerms: string[], viewMoreBtn: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const highlightedQ = highlightText(q, searchTerms);
@@ -74,6 +76,15 @@ const Question = ({ q, a, searchTerms }: { q: string, a: string, searchTerms: st
         className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <p className="p-4">{highlightedA}</p>
+        {viewMoreBtn && (
+          <Link
+            to="/faq/view-more"
+            className="flex w-fit items-center gap-2 px-4 py-2 mb-4 rounded-md bg-slate-200 hover:bg-slate-300 cursor-pointer transition duration-300"
+          >
+            مشاهده توضیحات تکمیلی
+            <FaEye />
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -93,8 +104,13 @@ const CategoryCard = ({ img, title, onClick, isSelected }: { img: string, title:
 }
 
 const FAQ = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialCategory = queryParams.get('category') || null;
+  const initialSearch = queryParams.get('search') || '';
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
 
   let filteredQuestions = questions;
 
@@ -149,7 +165,7 @@ const FAQ = () => {
       )}
       <div className="w-3xl mt-4 flex flex-col gap-2">
         {filteredQuestions.map((qa, index) => (
-          <Question q={qa.q} a={qa.a} searchTerms={terms} key={`question${index}`} />
+          <Question q={qa.q} a={qa.a} searchTerms={terms} key={`question${index}`} viewMoreBtn={!!qa.viewMoreBtn} />
         ))}
       </div>
 

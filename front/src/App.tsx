@@ -1,3 +1,4 @@
+// Updated App.tsx
 import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/App/ScrollToTop";
@@ -6,6 +7,7 @@ import Home from "./pages/home/Home";
 import About from "./pages/about/About";
 import City from "./pages/city/City";
 import FAQ from "./pages/faq/FAQ";
+import ViewMore from "./pages/faq/viewMore/ViewMore";
 import House from "./pages/house/House";
 
 import AdminLayout from "./layout/AdminLayout";
@@ -33,6 +35,7 @@ export default function App() {
           <Route path="/house" element={<House />} />
           <Route path="/villa-results/:city" element={<VillaResults />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/faq/view-more" element={<ViewMore />} />
 
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
