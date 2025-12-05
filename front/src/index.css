@@ -122,3 +122,14 @@
     font-optical-sizing: auto;
   }
 }
+
+.sidebar-active {
+  &::before {
+    content: '';
+    height: 90%;
+    width: 4px;
+    background-color: black;
+    border-radius: 10px 0 0 10px;
+    position: absolute;
+  }
+}

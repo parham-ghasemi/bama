@@ -19,6 +19,8 @@ import ListingDetail from "./pages/admin/ListingDetail";
 import Bookings from "./pages/admin/Bookings";
 import Finance from "./pages/admin/Finance";
 import VillaResults from "./pages/villaResults/VillaResults";
+import Profile from "./pages/profile/Profile";
+import Account from "./pages/profile/pages/account/Account";
 
 export default function App() {
   return (
@@ -36,6 +38,10 @@ export default function App() {
           <Route path="/villa-results/:city" element={<VillaResults />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/faq/view-more" element={<ViewMore />} />
+
+          <Route path="/profile" element={<Profile />} >
+            <Route path="account" element={<Account />} />
+          </Route>
 
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
