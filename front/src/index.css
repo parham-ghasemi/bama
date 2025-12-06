@@ -123,13 +123,22 @@
   }
 }
 
-.sidebar-active {
+.profile-sidebar {
   &::before {
     content: '';
     height: 90%;
+    width: 0px;
+    background-color: transparent;
+    border-radius: 0;
+    position: absolute;
+    transition: all ease 200ms;
+  }
+}
+
+.profile-sidebar-active {
+  &::before {
     width: 4px;
     background-color: black;
     border-radius: 10px 0 0 10px;
-    position: absolute;
   }
 }

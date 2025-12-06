@@ -10,7 +10,7 @@ import { cn } from "../../../lib/utils";
 
 const Item = ({ icon, subTitle, title, href, isActive }: { icon: any; title: string; subTitle: string; href: string; isActive: boolean }) => {
   return (
-    <Link to={href} className={cn("flex items-center gap-3 min-w-72 relative", isActive && "sidebar-active")}>
+    <Link to={href} className={cn("flex items-center gap-3 min-w-72 relative profile-sidebar", isActive && "profile-sidebar-active")}>
       <div className="px-6">
         {icon}
       </div>
@@ -29,19 +29,19 @@ const SideBar = () => {
 
   return (
     <div className="border shadow rounded-lg py-6 flex flex-col gap-4">
-      <Item icon={<CiRollingSuitcase size={24} />} subTitle="لیست سفرها و درخواست ها" title="سفر های من" href="/trips" isActive={location.pathname === "/trips"} />
-      <Item icon={<CiHeart size={24} />} subTitle="لیست اقامتگاه‌ها و هتل‌های مورد علاقه" title="مورد علاقه‌ها" href="/favorites" isActive={location.pathname === "/favorites"} />
+      <Item icon={<CiRollingSuitcase size={24} />} subTitle="لیست سفرها و درخواست ها" title="سفر های من" href="/profile/trips" isActive={location.pathname === "/profile/trips"} />
+      <Item icon={<CiHeart size={24} />} subTitle="لیست اقامتگاه‌ها و هتل‌های مورد علاقه" title="مورد علاقه‌ها" href="/profile/favorites" isActive={location.pathname === "/profile/favorites"} />
 
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> میزبانی اقامتگاه </p>
       <Item icon={<BsToggles size={24} />} subTitle="همین حالا اقامتگاهتان را ثبت و شروع به کسب درآمد کنید." title="میزبان شوید" href="/faq/view-more" isActive={location.pathname === "/faq/view-more"} />
 
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> حساب کاربری </p>
       <Item icon={<BsPerson size={24} />} subTitle="مشاهده و ویرایش اطلاعات شخصی" title="اطلاعات حساب کاربری" href="/profile/account" isActive={location.pathname === "/profile/account"} />
-      <Item icon={<BsReceipt size={24} />} subTitle="مشاهده تاریخ و زمان تراکنش ها" title="تراکنش‌های من" href="/profile/account/transaction" isActive={location.pathname === "/profile/account/transaction"} />
+      <Item icon={<BsReceipt size={24} />} subTitle="مشاهده تاریخ و زمان تراکنش ها" title="تراکنش‌های من" href="/profile/transactions" isActive={location.pathname === "/profile/transactions"} />
 
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> اعتبار و دعوت </p>
-      <Item icon={<BsWallet2 size={24} />} subTitle="موجودی، افزایش اعتبار" title="کیف پول" href="/profile/account/wallet" isActive={location.pathname === "/profile/account/wallet"} />
-      <Item icon={<BsCreditCard size={24} />} subTitle="کارت هدیه جاباما و دریافت اعتبار برای سفر" title="اعتبار سفر" href="/profile/account/travel-credit" isActive={location.pathname === "/profile/account/travel-credit"} />
+      <Item icon={<BsWallet2 size={24} />} subTitle="موجودی، افزایش اعتبار" title="کیف پول" href="/profile/wallet" isActive={location.pathname === "/profile/wallet"} />
+      <Item icon={<BsCreditCard size={24} />} subTitle="کارت هدیه جاباما و دریافت اعتبار برای سفر" title="اعتبار سفر" href="/profile/travel-credit" isActive={location.pathname === "/profile/travel-credit"} />
     </div>
   )
 }

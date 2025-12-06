@@ -21,6 +21,9 @@ import Finance from "./pages/admin/Finance";
 import VillaResults from "./pages/villaResults/VillaResults";
 import Profile from "./pages/profile/Profile";
 import Account from "./pages/profile/pages/account/Account";
+import Favorites from "./pages/profile/pages/favorites/Favorites";
+import Trips from "./pages/profile/pages/trips/Trips";
+import Transactions from "./pages/profile/pages/transactions/Transactions";
 
 export default function App() {
   return (
@@ -41,6 +44,9 @@ export default function App() {
 
           <Route path="/profile" element={<Profile />} >
             <Route path="account" element={<Account />} />
+            <Route path="favorites" element={<Favorites />} />
+            <Route path="trips" element={<Trips />} />
+            <Route path="transactions" element={<Transactions />} />
           </Route>
 
           {/* Admin routes */}
