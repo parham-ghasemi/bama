@@ -142,3 +142,8 @@
     border-radius: 10px 0 0 10px;
   }
 }
+
+.wallet-card-bg {
+  background: conic-gradient(from 231deg at 50% 50%, #004488ff 0%, #4d85b3ff 29%, #80b3d9ff 90%, #ffffffa6 95%, #004488ff 100%);
+  filter: blur(25px);
+}

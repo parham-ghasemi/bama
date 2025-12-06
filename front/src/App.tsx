@@ -1,4 +1,3 @@
-// Updated App.tsx
 import { Toaster } from "sonner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/App/ScrollToTop";
@@ -24,6 +23,7 @@ import Account from "./pages/profile/pages/account/Account";
 import Favorites from "./pages/profile/pages/favorites/Favorites";
 import Trips from "./pages/profile/pages/trips/Trips";
 import Transactions from "./pages/profile/pages/transactions/Transactions";
+import Wallet from "./pages/profile/pages/wallet/Wallet";
 
 export default function App() {
   return (
@@ -47,6 +47,7 @@ export default function App() {
             <Route path="favorites" element={<Favorites />} />
             <Route path="trips" element={<Trips />} />
             <Route path="transactions" element={<Transactions />} />
+            <Route path="wallet" element={<Wallet />} />
           </Route>
 
           {/* Admin routes */}
