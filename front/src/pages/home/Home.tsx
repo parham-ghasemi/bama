@@ -6,7 +6,7 @@ import SignupBtn from "../../components/SignupBtn";
 import VillaTypes from "./components/VillaTypes";
 import AuthModal from "./components/AuthModal";
 import ScoreBtn from "../../components/ScoreBtn";
-import ScoreModal from "./components/ScoreModal"; // Assuming ScoreModal is in the same directory; adjust if needed
+import ScoreModal from "./components/ScoreModal";
 
 const cityCards = [
   {
@@ -15,27 +15,27 @@ const cityCards = [
   },
   {
     img: "/home/bandaranzali.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در بندر انزلی",
   },
   {
     img: "/home/rasht.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در رشت",
   },
   {
     img: "/home/tehran.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در تهران",
   },
   {
     img: "/home/tehran.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در تهران",
   },
   {
     img: "/home/tehran.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در تهران",
   },
   {
     img: "/home/tehran.jpg",
-    title: "اجاره ویلا در نوشهر",
+    title: "اجاره ویلا در تهران",
   },
 ]
 
@@ -154,10 +154,10 @@ const Home = () => {
           <HomeRow noc={4} cards={cityCards} subtitle="اقامتگاه در شهرهای پرطرفدار با ما " title="اجاره ویلا در محبوب‌ترین شهرها " type="city" />
         </div>
         <div className="mt-32">
-          <HomeRow noc={5} cards={cityCards} subtitle="اقامتگاه در شهرهای پرطرفدار با ما " title="اجاره ویلا در محبوب‌ترین شهرها " type="house" />
+          <HomeRow noc={5} cards={cityCards} subtitle="تجربه اقامت در کنار مردم خونگرم جنوب با ما " title="بومگردی، ویلا و اقامتگاه در جنوب زیبا" type="house" />
         </div>
         <div className="mt-32">
-          <HomeRow noc={4} cards={cityCards} subtitle="اقامتگاه در شهرهای پرطرفدار با ما " title="اجاره ویلا در محبوب‌ترین شهرها " type="house" />
+          <HomeRow noc={4} cards={cityCards} subtitle="ویلا، سوئیت و کلبه در شمال زیبا" title="اجاره ویلا و اقامت تو شهرهای شمالی با ما " type="house" />
         </div>
 
 

@@ -1,5 +1,5 @@
 import { FaPen } from "react-icons/fa6"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import DatePicker, { DateObject } from "react-multi-date-picker"
 import persian from "react-date-object/calendars/persian"
 import persian_fa from "react-date-object/locales/persian_fa"
@@ -18,12 +18,34 @@ const Account = () => {
   const [firstName, setFirstName] = useState("پرهام")
   const [lastName, setLastName] = useState("قاسمی")
   const [nationalCode, setNationalCode] = useState("0251170829")
+  const [isNationalCodeValid, setIsNationalCodeValid] = useState(true)
   const [gender, setGender] = useState("male")
   const [birthDate, setBirthDate] = useState<DateObject | null>(null)
   const [mobile, setMobile] = useState("09912525964")
+  const [isMobileValid, setIsMobileValid] = useState(true)
   const [email, setEmail] = useState("parham.ghasemi.1388@gmail.com")
   const [homePhone, setHomePhone] = useState("02156781234") // Random Tehran format
+  const [isHomePhoneValid, setIsHomePhoneValid] = useState(true)
   const [bio, setBio] = useState("")
+  const [profilePicture, setProfilePicture] = useState<string | null>(null)
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const validateNationalCode = (code: string): boolean => {
+    if (!/^\d{10}$/.test(code)) return false
+    const digits = code.split('').map(Number)
+    const checkDigit = digits[9]
+    let sum = 0
+    for (let i = 0; i < 9; i++) {
+      sum += digits[i] * (10 - i)
+    }
+    const remainder = sum % 11
+    return (remainder < 2 && checkDigit === remainder) || (remainder >= 2 && checkDigit === 11 - remainder)
+  }
+
+  const validateIranianPhone = (phone: string): boolean => {
+    return /^0[1-9]\d{9}$/.test(phone)
+  }
 
   const loadFromLocalStorage = () => {
     const savedData = localStorage.getItem("accountData")
@@ -31,18 +53,29 @@ const Account = () => {
       const parsedData = JSON.parse(savedData)
       setFirstName(parsedData.firstName || "پرهام")
       setLastName(parsedData.lastName || "قاسمی")
-      setNationalCode(parsedData.nationalCode || "0251170829")
+      const newNationalCode = parsedData.nationalCode || "0251170829"
+      setNationalCode(newNationalCode)
+      setIsNationalCodeValid(validateNationalCode(newNationalCode))
       setGender(parsedData.gender || "male")
       if (parsedData.birthDate) {
-        // @ts-ignore
-        setBirthDate(new DateObject({ calendar: persian }).parse(parsedData.birthDate, "YYYY/MM/DD"))
+        setBirthDate(new DateObject({
+          date: parsedData.birthDate,
+          format: "YYYY/MM/DD",
+          calendar: persian,
+          locale: persian_fa
+        }))
       } else {
         setBirthDate(null)
       }
-      setMobile(parsedData.mobile || "09912525964")
+      const newMobile = parsedData.mobile || "09912525964"
+      setMobile(newMobile)
+      setIsMobileValid(validateIranianPhone(newMobile))
       setEmail(parsedData.email || "parham.ghasemi.1388@gmail.com")
-      setHomePhone(parsedData.homePhone || "02156781234")
+      const newHomePhone = parsedData.homePhone || "02156781234"
+      setHomePhone(newHomePhone)
+      setIsHomePhoneValid(validateIranianPhone(newHomePhone))
       setBio(parsedData.bio || "")
+      setProfilePicture(parsedData.profilePicture || null)
     }
   }
 
@@ -60,7 +93,8 @@ const Account = () => {
       mobile,
       email,
       homePhone,
-      bio
+      bio,
+      profilePicture
     }
     localStorage.setItem("accountData", JSON.stringify(data))
     toast("تغییرات با موفقیت ذخیره شد")
@@ -69,6 +103,17 @@ const Account = () => {
   const handleCancel = () => {
     loadFromLocalStorage()
     toast("تغییرات لغو شد")
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setProfilePicture(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   return (
@@ -125,14 +170,32 @@ const Account = () => {
           }
         `}</style>
         <div className="flex gap-12 items-center py-3 border-dashed border-b border-neutral-400">
-          <div className="h-14 w-14 bg-neutral-100 border border-neutral-300 rounded-full flex items-center justify-center font-black">
-            {firstName[0] || "پ"}
-          </div>
+          {profilePicture ? (
+            <img
+              src={profilePicture}
+              alt="Profile"
+              className="h-14 w-14 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-14 w-14 bg-neutral-100 border border-neutral-300 rounded-full flex items-center justify-center font-black">
+              {firstName[0] || "پ"}
+            </div>
+          )}
 
-          <p className="text-blue-600 text-xs flex items-center gap-1 cursor-pointer hover:underline">
+          <p
+            className="text-blue-600 text-xs flex items-center gap-1 cursor-pointer hover:underline"
+            onClick={() => inputRef.current?.click()}
+          >
             <FaPen />
             ویرایش عکس پروفایل
           </p>
+          <input
+            type="file"
+            accept="image/*"
+            ref={inputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
         </div>
 
         <div className="flex gap-12 items-center py-4 border-dashed border-b border-neutral-400">
@@ -153,15 +216,21 @@ const Account = () => {
           </div>
         </div>
 
-        <div className="flex gap-12 items-center py-4 border-dashed border-b border-neutral-400">
-          <p className="text-sm w-32">کد ملی </p>
-          <div className="w-xl flex gap-6">
+        <div className="flex gap-12 items-start py-4 border-dashed border-b border-neutral-400">
+          <p className="text-sm w-32 mt-2">کد ملی </p>
+          <div className="w-xl flex flex-col gap-1">
             <input
               type="text"
               value={nationalCode}
-              onChange={(e) => setNationalCode(e.target.value)}
-              className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
+              onChange={(e) => {
+                const value = e.target.value
+                setNationalCode(value)
+                setIsNationalCodeValid(validateNationalCode(value))
+              }}
+              className={`border ${isNationalCodeValid ? 'border-neutral-300' : 'border-red-500'} rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full`}
+              dir="ltr"
             />
+            {!isNationalCodeValid && <p className="text-red-500 text-xs">کد ملی نامعتبر</p>}
           </div>
         </div>
 
@@ -169,7 +238,7 @@ const Account = () => {
           <p className="text-sm w-32">جنسیت</p>
           <div className="w-xl flex gap-6">
             <Select value={gender} onValueChange={setGender} dir="rtl">
-              <SelectTrigger className="w-full border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300">
+              <SelectTrigger className="w-1/3 border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300">
                 <SelectValue placeholder="انتخاب کنید" />
               </SelectTrigger>
               <SelectContent>
@@ -199,21 +268,28 @@ const Account = () => {
                   onClick={openCalendar}
                   className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
                   readOnly
+                  dir="ltr"
                 />
               )}
             />
           </div>
         </div>
 
-        <div className="flex gap-12 items-center py-4 border-dashed border-b border-neutral-400">
-          <p className="text-sm w-32">شماره همراه </p>
-          <div className="w-xl flex gap-6">
+        <div className="flex gap-12 items-start py-4 border-dashed border-b border-neutral-400">
+          <p className="text-sm w-32 mt-2">شماره همراه </p>
+          <div className="w-xl flex flex-col gap-1">
             <input
               type="text"
               value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
+              onChange={(e) => {
+                const value = e.target.value
+                setMobile(value)
+                setIsMobileValid(validateIranianPhone(value))
+              }}
+              className={`border ${isMobileValid ? 'border-neutral-300' : 'border-red-500'} rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full`}
+              dir="ltr"
             />
+            {!isMobileValid && <p className="text-red-500 text-xs">شماره همراه نامعتبر</p>}
           </div>
         </div>
 
@@ -225,30 +301,37 @@ const Account = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
+              dir="ltr"
             />
           </div>
         </div>
 
-        <div className="flex gap-12 items-center py-4 border-dashed border-b border-neutral-400">
-          <p className="text-sm w-32">شماره ثابت </p>
-          <div className="w-xl flex gap-6">
+        <div className="flex gap-12 items-start py-4 border-dashed border-b border-neutral-400">
+          <p className="text-sm w-32 mt-2">شماره ثابت </p>
+          <div className="w-xl flex flex-col gap-1">
             <input
               type="text"
               value={homePhone}
-              onChange={(e) => setHomePhone(e.target.value)}
-              className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
+              onChange={(e) => {
+                const value = e.target.value
+                setHomePhone(value)
+                setIsHomePhoneValid(validateIranianPhone(value))
+              }}
+              className={`border ${isHomePhoneValid ? 'border-neutral-300' : 'border-red-500'} rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full`}
+              dir="ltr"
             />
+            {!isHomePhoneValid && <p className="text-red-500 text-xs">شماره ثابت نامعتبر</p>}
           </div>
         </div>
 
         <div className="flex gap-12 items-center py-4 border-dashed border-b border-neutral-400">
           <p className="text-sm w-32">معرفی مختصر </p>
           <div className="w-xl flex gap-6">
-            <input
-              type="text"
+            <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               className="border border-neutral-300 rounded px-2 py-3 text-sm focus:outline-none focus:shadow shadow-neutral-400 transition-all duration-300 w-full"
+              rows={4}
             />
           </div>
         </div>

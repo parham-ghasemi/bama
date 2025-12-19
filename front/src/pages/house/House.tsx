@@ -2,9 +2,9 @@ import { FaArrowLeft, FaArrowRight, FaCheckCircle, FaRegCalendarAlt, FaTimes, Fa
 import { PiSecurityCameraDuotone } from "react-icons/pi";
 import { TbAirConditioning, TbFridge } from "react-icons/tb";
 import { MdOutlineLtePlusMobiledata } from "react-icons/md";
-import { FaLocationDot, FaStar } from "react-icons/fa6"
+import { FaLocationDot, FaStar, FaHeart, FaRegHeart, FaBrain } from "react-icons/fa6"
 import { Link } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import DatePicker, { DateObject } from "react-multi-date-picker"
 import persian from "react-date-object/calendars/persian"
 import persian_fa from "react-date-object/locales/persian_fa"
@@ -14,6 +14,7 @@ import { CiNoWaitingSign } from "react-icons/ci";
 import Footer from "../../components/Footer";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import { RiSparkling2Fill } from "react-icons/ri";
 
 const toPersianNum = (num: number | string): string => {
   const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
@@ -33,6 +34,63 @@ const House = () => {
   const [exitDate, setExitDate] = useState<DateObject>(new DateObject({ calendar: persian }).add(1, "day"));
   const [adults, setAdults] = useState<number>(1);
   const [children, setChildren] = useState<number>(0);
+  const [isFavorited, setIsFavorited] = useState<boolean>(false);
+  const [modalCommentImage, setModalCommentImage] = useState<string | null>(null);
+  const [newName, setNewName] = useState('');
+  const [newRating, setNewRating] = useState(0);
+  const [newText, setNewText] = useState('');
+  const [newImage, setNewImage] = useState<File | null>(null);
+
+  const initialComments = [
+    {
+      name: "علی رضایی",
+      text: "ویلا خیلی تمیز و راحت بود. محیط آرام و میزبان بسیار مهمان‌نواز. حتما دوباره می‌آیم.",
+      rating: 5,
+      date: "۱۴۰۳/۰۹/۱۰",
+      image: "/villa/1.jpg"
+    },
+    {
+      name: "سارا محمدی",
+      text: "مکان عالی برای تعطیلات خانوادگی. امکانات کامل بود اما اینترنت ضعیف بود.",
+      rating: 4,
+      date: "۱۴۰۳/۰۸/۲۵",
+      image: "/villa/3.jpg"
+    },
+    {
+      name: "محمد احمدی",
+      text: "قیمت مناسب و ویو زیبا. فقط دسترسی به فروشگاه کمی دور بود.",
+      rating: 4,
+      date: "۱۴۰۳/۰۷/۱۵",
+      image: null
+    },
+    {
+      name: "فاطمه کریمی",
+      text: "همه چیز عالی بود. تمیزی و امنیت بالا.推荐 به دوستان.",
+      rating: 5,
+      date: "۱۴۰۳/۰۶/۰۵",
+      image: "/villa/5.jpg"
+    },
+    {
+      name: "رضا نوری",
+      text: "ویلا خوب بود اما سیستم سرمایشی نیاز به تعمیر داشت.",
+      rating: 3,
+      date: "۱۴۰۳/۰۵/۲۰",
+      image: "/villa/2.jpg"
+    }
+  ];
+
+  const [comments, setComments] = useState(initialComments);
+
+  useEffect(() => {
+    const favorited = localStorage.getItem('isFavorited') === 'true';
+    setIsFavorited(favorited);
+  }, []);
+
+  const toggleFavorite = () => {
+    const newValue = !isFavorited;
+    setIsFavorited(newValue);
+    localStorage.setItem('isFavorited', newValue.toString());
+  };
 
   const images = [
     "/villa/1.jpg",
@@ -89,6 +147,9 @@ const House = () => {
     }
   ];
 
+  // Fake AI overview
+  const aiOverview = "بر اساس نظرات کاربران، این ویلا دارای محیط آرام، تمیزی بالا و امکانات مناسب است. اکثر کاربران از مهمان‌نوازی میزبان راضی بودند، اما برخی به ضعف اینترنت و دسترسی به مراکز خرید اشاره کرده‌اند. امتیاز کلی: ۴.۳ از ۵.";
+
   // Fake occupied dates (using Persian calendar dates, e.g., assuming current year/month for demo)
   const occupiedDates = [
     new DateObject({ calendar: persian, year: 1404, month: 9, day: 10 }),
@@ -113,6 +174,27 @@ const House = () => {
         ),
       };
     }
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <FaStar key={i} size={16} className={i < rating ? "text-yellow-400" : "text-gray-300"} />
+    ));
+  };
+
+  const renderInteractiveStars = () => {
+    return (
+      <div className="flex">
+        {Array.from({ length: 5 }, (_, i) => (
+          <FaStar
+            key={i}
+            size={20}
+            className={i < newRating ? "text-yellow-400 cursor-pointer" : "text-gray-300 cursor-pointer"}
+            onClick={() => setNewRating(i + 1)}
+          />
+        ))}
+      </div>
+    );
   };
 
   const openModal = (index: number) => {
@@ -141,6 +223,32 @@ const House = () => {
 
   const handleExitDateChange = (date: DateObject) => {
     setExitDate(date);
+  };
+
+  const handleSubmitComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName || !newText || newRating === 0) return;
+
+    const currentDate = new DateObject({ calendar: persian }).format('YYYY/MM/DD');
+    const imageUrl = newImage ? URL.createObjectURL(newImage) : null;
+
+    const newComment = {
+      name: newName,
+      text: newText,
+      rating: newRating,
+      date: currentDate,
+      image: imageUrl
+    };
+
+    setComments([...comments, newComment]);
+    setNewName('');
+    setNewRating(0);
+    setNewText('');
+    setNewImage(null);
+  };
+
+  const closeCommentModal = () => {
+    setModalCommentImage(null);
   };
 
   return (
@@ -182,6 +290,15 @@ const House = () => {
               </p>
             </div>
           </div>
+
+          <button
+            onClick={toggleFavorite}
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition cursor-pointer ${isFavorited ? 'border-red-500 text-red-500 hover:bg-red-50' : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+              }`}
+          >
+            {isFavorited ? <FaHeart size={20} /> : <FaRegHeart size={20} />}
+            <span className="text-xs">{isFavorited ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}</span>
+          </button>
         </div>
 
 
@@ -296,7 +413,7 @@ const House = () => {
 
           </div>
 
-          <div className="col-span-2 border rounded-xl p-5 space-y-3" >
+          <div className="col-span-2 border rounded-xl p-5 space-y-3 h-fit" >
             <div className="flex justify-between items-center">
               <p className="text-sm">شروع از: 1,210,000 تومان / هرشب</p>
               <p className="flex items-center gap-2 text-xs">
@@ -402,13 +519,89 @@ const House = () => {
               </div>
             </div>
 
-            <button className="w-full bg-black rounded text-white py-2">
-              انتخاب تاریخ رزرو
+            <button className="w-full bg-neutral-800 hover:bg-neutral-900 cursor-pointer rounded-lg text-white py-2 font-bold text-md">
+              رزرو
             </button>
           </div>
         </div>
 
         <div className="h-px w-full bg-neutral-400 mt-16" />
+
+        {/* COMMENTS SECTION START */}
+        <div className="space-y-5 mt-16">
+          <h2 className="font-bold text-xl">نظرات کاربران</h2>
+
+          {/* Fake AI Overview */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 relative">
+            <h3 className="font-bold text-md mb-2">خلاصه نظرات</h3>
+            <p className="text-sm">{aiOverview}</p>
+
+            <div className="absolute left-2 bottom-2 flex gap-1 items-center opacity-50">
+              <span className="text-cyan-700 text-xs">برگرفته از هوش مصنوعی</span>
+              <RiSparkling2Fill className="text-cyan-700" size={14} />
+            </div>
+          </div>
+
+          {/* Comments List */}
+          <div className="space-y-6">
+            {comments.map((comment, index) => (
+              <div key={index} className="border rounded-lg p-4 shadow-md bg-white">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex flex-col">
+                    <p className="font-bold text-base">{comment.name}</p>
+                    <div className="flex mt-1">{renderStars(comment.rating)}</div>
+                  </div>
+                  <p className="text-xs text-gray-500">{comment.date}</p>
+                </div>
+                <p className="text-sm mb-3">{comment.text}</p>
+                {comment.image && (
+                  <img
+                    src={comment.image}
+                    alt="تصویر پیوست نظر"
+                    className="w-32 h-32 object-cover rounded-lg cursor-pointer"
+                    onClick={() => setModalCommentImage(comment.image)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Add Comment Form */}
+          <div className="mt-8 border rounded-lg p-4 shadow-md bg-white">
+            <h3 className="font-bold text-md mb-4">اضافه کردن نظر جدید</h3>
+            <form onSubmit={handleSubmitComment} className="space-y-4">
+              <input
+                type="text"
+                placeholder="نام شما"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="w-full p-2 border rounded"
+                required
+              />
+              <div>
+                <p className="text-sm mb-1">امتیاز:</p>
+                {renderInteractiveStars()}
+              </div>
+              <textarea
+                placeholder="نظر شما"
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                className="w-full p-2 border rounded h-24"
+                required
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewImage(e.target.files ? e.target.files[0] : null)}
+                className="w-full p-2 border rounded"
+              />
+              <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
+                ارسال نظر
+              </button>
+            </form>
+          </div>
+        </div>
+        {/* COMMENTS SECTION END */}
 
         {/* SIMILAR VILLAS SECTION START */}
         <div className="space-y-5 mt-8">
@@ -451,6 +644,7 @@ const House = () => {
           </Swiper>
         </div>
         {/* SIMILAR VILLAS SECTION END */}
+
       </div>
 
       {isModalOpen && (
@@ -487,6 +681,27 @@ const House = () => {
             <div className="text-white mt-2 text-sm">
               {selectedIndex + 1} / {images.length}
             </div>
+          </div>
+        </div>
+      )}
+
+      {modalCommentImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={closeCommentModal}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh] flex flex-col items-center">
+            <button
+              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 p-2 rounded-full hover:bg-opacity-75 transition"
+              onClick={closeCommentModal}
+            >
+              <FaTimes size={24} />
+            </button>
+            <img
+              src={modalCommentImage}
+              alt="تصویر نظر"
+              className="w-[80vw] h-[80vh] object-contain rounded-lg shadow-2xl"
+            />
           </div>
         </div>
       )}

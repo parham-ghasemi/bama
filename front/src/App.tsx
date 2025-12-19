@@ -24,6 +24,7 @@ import Favorites from "./pages/profile/pages/favorites/Favorites";
 import Trips from "./pages/profile/pages/trips/Trips";
 import Transactions from "./pages/profile/pages/transactions/Transactions";
 import Wallet from "./pages/profile/pages/wallet/Wallet";
+import NotFoundPage from "./pages/404/NotFound";
 
 export default function App() {
   return (
@@ -65,7 +66,7 @@ export default function App() {
           </Route>
 
           {/* Redirect any unknown route */}
-          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -147,3 +147,18 @@
   background: conic-gradient(from 231deg at 50% 50%, #004488ff 0%, #4d85b3ff 29%, #80b3d9ff 90%, #ffffffa6 95%, #004488ff 100%);
   filter: blur(25px);
 }
+
+.e-underline {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    border-radius: 999px;
+    content: '';
+    background-color: black;
+    bottom: 2px;
+  }
+}
