@@ -37,7 +37,8 @@ app.get("/api/health", (req, res) => {
 });
 
 // Example route
-
+const userRoutes = require('./routes/user.routes');
+app.use('/api', userRoutes);
 
 /* ======================
    Start Server
