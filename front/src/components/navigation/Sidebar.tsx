@@ -29,6 +29,10 @@ const Sidebar = () => {
         <i className="fa fa-money ml-[5px]" aria-hidden="true"></i>
         مالی
       </Link>
+      <Link to="/admin/tickets" className={linkClass}>
+        <i className="fa fa-ticket ml-[5px]" aria-hidden="true"></i>
+        تیکت‌ها
+      </Link>
     </aside>
   );
 };

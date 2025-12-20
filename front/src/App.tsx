@@ -26,6 +26,10 @@ import Transactions from "./pages/profile/pages/transactions/Transactions";
 import Wallet from "./pages/profile/pages/wallet/Wallet";
 import NotFoundPage from "./pages/404/NotFound";
 
+import { TicketsProvider } from "./pages/admin/tickets/TicketsProvider";
+import { TicketsPage } from "./pages/admin/tickets/pages/TicketsPage";
+import { TicketDetailsPage } from "./pages/admin/tickets/pages/TicketDetailsPage";
+
 export default function App() {
   return (
     <div dir="rtl">
@@ -52,7 +56,7 @@ export default function App() {
           </Route>
 
           {/* Admin routes */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<TicketsProvider><AdminLayout /></TicketsProvider>}>
             <Route index element={<Dashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="users/:id" element={<UserDetail />} />
@@ -63,6 +67,9 @@ export default function App() {
             <Route path="bookings" element={<Bookings />} />
 
             <Route path="finance" element={<Finance />} />
+
+            <Route path="tickets" element={<TicketsPage />} />
+            <Route path="tickets/:id" element={<TicketDetailsPage />} />
           </Route>
 
           {/* Redirect any unknown route */}

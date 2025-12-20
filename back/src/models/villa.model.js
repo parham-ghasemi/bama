@@ -1,4 +1,3 @@
-// models/Villa.js (assuming path)
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
