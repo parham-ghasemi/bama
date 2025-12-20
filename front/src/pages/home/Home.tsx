@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import HomeRow from "./components/HomeRow";
@@ -7,6 +7,9 @@ import VillaTypes from "./components/VillaTypes";
 import AuthModal from "./components/AuthModal";
 import ScoreBtn from "../../components/ScoreBtn";
 import ScoreModal from "./components/ScoreModal";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 
 const cityCards = [
   {
@@ -108,6 +111,8 @@ const Home = () => {
   const [scoreOrigin, setScoreOrigin] = useState({ x: 50, y: 50 });
   const scoreButtonRef = useRef<HTMLDivElement>(null);
 
+  const heroImages = ["/home/hero.jpg", "/home/hero2.png", "/home/hero3.png"];
+
   const handleOpenAuth = () => {
     if (authButtonRef.current) {
       const rect = authButtonRef.current.getBoundingClientRect();
@@ -134,9 +139,26 @@ const Home = () => {
 
   return (
     <div className="w-screen min-h-screen relative ">
-      <div className="absolute w-full  h-[720px] overflow-hidden z-0">
-        <img src="/home/hero.jpg" alt="" className="absolute top-0 left-0 right-0 z-0" />
-        <div className=" absolute left-0 right-0 h-7 bg-[linear-gradient(0deg,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_100%)] z-10 bottom-0"></div>
+      <div className="absolute w-full h-[720px] overflow-hidden z-0">
+        <Swiper
+          modules={[Autoplay]}
+          spaceBetween={0}
+          slidesPerView={1}
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          loop={true}
+          className="w-full h-full"
+        >
+          {heroImages.map((src, index) => (
+            <SwiperSlide key={index}>
+              <img
+                src={src}
+                alt={`Hero image ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <div className="absolute left-0 right-0 h-7 bg-[linear-gradient(0deg,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_100%)] z-10 bottom-0"></div>
       </div>
 
       <div className="flex justify-between p-4 ml-4">
@@ -238,4 +260,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Home 
