@@ -1,3 +1,4 @@
+// models/Villa.js (assuming path)
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -72,6 +73,24 @@ const villaSchema = new Schema({
   numberOfFarangiToilets: {
     type: Number,
     default: 0
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Assuming you have a User model
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  rejectionReason: {
+    type: String,
+    default: ''
+  },
+  deletionDate: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
