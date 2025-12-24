@@ -36,9 +36,17 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-// Example route
 const userRoutes = require('./routes/user.routes');
-app.use('/api', userRoutes);
+app.use('/api/user', userRoutes);
+
+const commentRoutes = require('./routes/comment.routes');
+app.use('/api', commentRoutes);
+
+const reservationRoutes = require('./routes/reservation.routes');
+app.use('/api', reservationRoutes);
+
+const villaRoutes = require('./routes/villa.routes');
+app.use('/api', villaRoutes);
 
 /* ======================
    Start Server

@@ -1,6 +1,5 @@
-// controllers/villaController.js
-const Villa = require('../models/Villa'); // Adjust path to your Villa model
-const User = require('../models/User'); // Adjust path to your User model
+const Villa = require('../models/villa.model');
+const User = require('../models/user.model');
 
 // Create a new villa (user uploads, sets to pending)
 exports.createVilla = async (req, res) => {
@@ -176,5 +175,53 @@ exports.rejectVilla = async (req, res) => {
     res.json({ message: 'Villa rejected successfully', villa });
   } catch (error) {
     res.status(500).json({ message: 'Error rejecting villa', error: error.message });
+  }
+};
+
+// Toggle like for a villa
+exports.toggleLike = async (req, res) => {
+  try {
+    const villa = await Villa.findById(req.params.id);
+    if (!villa || villa.status !== 'approved') {
+      return res.status(404).json({ message: 'Villa not found or not approved' });
+    }
+
+    const user = await User.findById(req.user.id);
+    const isLiked = user.LikedVillas.includes(villa._id);
+
+    if (isLiked) {
+      user.LikedVillas.pull(villa._id);
+    } else {
+      user.LikedVillas.push(villa._id);
+    }
+
+    await user.save();
+
+    res.json({ liked: !isLiked });
+  } catch (error) {
+    res.status(500).json({ message: 'Error toggling like', error: error.message });
+  }
+};
+
+// Get past reserved dates for a villa
+exports.getPastReservedDates = async (req, res) => {
+  try {
+    const villa = await Villa.findById(req.params.id);
+    if (!villa) {
+      return res.status(404).json({ message: 'Villa not found' });
+    }
+
+    if (villa.status === 'approved' || (req.user && villa.owner.toString() === req.user.id) || (req.user && req.user.role === 'admin')) {
+      const current = moment().format('jYYYY/jMM/jDD');
+      const pastReservations = await Reservation.find({
+        villa: req.params.id,
+        until: { $lt: current }
+      }).select('from until');
+      res.json(pastReservations);
+    } else {
+      res.status(403).json({ message: 'Access denied' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching past reserved dates', error: error.message });
   }
 };

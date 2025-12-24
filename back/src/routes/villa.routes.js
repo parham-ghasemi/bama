@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const villaController = require('../controllers/villaController');
-const { auth, isAdmin } = require('../middleware/auth'); // Adjust path to your auth middleware
+const villaController = require('../controllers/villa.controller');
+const { auth, isAdmin } = require('../middleware/auth.middleware');
 
 // Create villa (authenticated user)
 router.post('/', auth, villaController.createVilla);
@@ -23,5 +23,14 @@ router.put('/:id/approve', auth, isAdmin, villaController.approveVilla);
 
 // Admin: Reject villa
 router.put('/:id/reject', auth, isAdmin, villaController.rejectVilla);
+
+// Toggle like villa
+router.post('/:id/like', auth, villaController.toggleLike);
+
+// Get past reserved dates
+router.get('/:id/past-reserved', auth, villaController.getPastReservedDates);
+
+// Create comment (moved to villa routes for per villa)
+router.post('/:villaId/comments', auth, require('../controllers/comment.controller').createComment);
 
 module.exports = router;

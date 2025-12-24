@@ -131,3 +131,24 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+exports.getHistory = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate({
+      path: 'history',
+      populate: { path: 'villa' }
+    });
+    res.json(user.history);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+exports.getSubmittedVillas = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('submittedVillas');
+    res.json(user.submittedVillas);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
