@@ -84,6 +84,8 @@ const Tickets = () => {
     }
   };
 
+  console.log(tickets)
+
   return (
     <div className="w-full max-w-5xl mx-auto min-h-[550px] dir-rtl">
       {/* 1. CHAT WINDOW PANEL */}
@@ -112,12 +114,14 @@ const Tickets = () => {
           {/* User Side Message Flow */}
           <CardContent className="flex-1 overflow-y-auto space-y-4 p-6 bg-zinc-50/20">
             {selectedTicket.messages.map((msg, index) => {
-              const isUser = msg.sender === selectedTicket.messages[0].sender;
+              // Look how clean this is now—no ID matching hacks needed:
+              const isUser = msg.sender === 'user';
+
               return (
                 <div key={index} className={`flex w-full ${isUser ? 'justify-start' : 'justify-end'}`}>
                   <div className="flex flex-col max-w-[75%] space-y-1">
                     <div className={`p-3 shadow-sm text-sm leading-relaxed whitespace-pre-wrap rounded-2xl
-                      ${isUser
+            ${isUser
                         ? 'bg-zinc-900 text-white rounded-tr-none'
                         : 'bg-sky-50 text-sky-950 border border-sky-100 rounded-tl-none'
                       }`}

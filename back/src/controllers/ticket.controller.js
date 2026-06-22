@@ -13,7 +13,15 @@ exports.createTicket = async (req, res) => {
     });
 
     await ticket.save();
-    res.status(201).json(ticket);
+
+    // Map before responding
+    const ticketObj = ticket.toObject();
+    ticketObj.messages = ticketObj.messages.map(msg => ({
+      ...msg,
+      sender: msg.sender.toString() === ticketObj.user.toString() ? 'user' : 'admin'
+    }));
+
+    res.status(201).json(ticketObj);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -22,8 +30,18 @@ exports.createTicket = async (req, res) => {
 // User: Get their own tickets
 exports.getUserTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find({ user: req.user.id }).sort({ updatedAt: -1 });
-    res.json(tickets);
+    const tickets = await Ticket.find({ user: req.user.id }).sort({ updatedAt: -1 }).lean();
+
+    // Safely transform sender field for presentation security
+    const sanitizedTickets = tickets.map(ticket => ({
+      ...ticket,
+      messages: ticket.messages.map(msg => ({
+        ...msg,
+        sender: msg.sender.toString() === ticket.user.toString() ? 'user' : 'admin'
+      }))
+    }));
+
+    res.json(sanitizedTickets);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -48,13 +66,21 @@ exports.replyToTicket = async (req, res) => {
       message
     });
 
-    // Automatically re-open if user replies to a closed ticket (keep it presentation-friendly)
+    // Automatically re-open if user replies to a closed ticket
     if (req.user.role !== 'admin') {
       ticket.status = 'open';
     }
 
     await ticket.save();
-    res.json(ticket);
+
+    // Sanitize payload right before delivery
+    const ticketObj = ticket.toObject();
+    ticketObj.messages = ticketObj.messages.map(msg => ({
+      ...msg,
+      sender: msg.sender.toString() === ticketObj.user.toString() ? 'user' : 'admin'
+    }));
+
+    res.json(ticketObj);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -67,8 +93,20 @@ exports.getAdminTickets = async (req, res) => {
   try {
     const tickets = await Ticket.find()
       .populate('user', 'name phoneNumber')
-      .sort({ updatedAt: -1 });
-    res.json(tickets);
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    // Optional: You can do the exact same sanitization here if you want consistency 
+    // for your admin view UI definitions too!
+    const sanitizedTickets = tickets.map(ticket => ({
+      ...ticket,
+      messages: ticket.messages.map(msg => ({
+        ...msg,
+        sender: msg.sender.toString() === ticket.user?._id?.toString() ? 'user' : 'admin'
+      }))
+    }));
+
+    res.json(sanitizedTickets);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -84,7 +122,14 @@ exports.closeTicket = async (req, res) => {
 
     ticket.status = ticket.status === 'open' ? 'closed' : 'open';
     await ticket.save();
-    res.json(ticket);
+
+    const ticketObj = ticket.toObject();
+    ticketObj.messages = ticketObj.messages.map(msg => ({
+      ...msg,
+      sender: msg.sender.toString() === ticketObj.user.toString() ? 'user' : 'admin'
+    }));
+
+    res.json(ticketObj);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }

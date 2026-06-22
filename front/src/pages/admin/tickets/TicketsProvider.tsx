@@ -31,13 +31,27 @@ export const TicketsProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
 
       // Safely structure messages
+      // Safely structure messages
       const formattedMessages: Message[] = Array.isArray(t.messages)
-        ? t.messages.map((m: any) => ({
-          id: m._id || Math.random().toString(),
-          sender: m.sender === (t.user?._id || t.user) ? 'user' : 'admin',
-          text: typeof m.message === 'object' ? JSON.stringify(m.message) : String(m.message || ''),
-          timestamp: m.createdAt ? new Date(m.createdAt) : new Date(),
-        }))
+        ? t.messages.map((m: any) => {
+          // 1. Check if the backend already sanitized it to a string 'user' | 'admin'
+          let normalizedSender: 'user' | 'admin' = 'admin';
+
+          if (m.sender === 'user' || m.sender === 'admin') {
+            normalizedSender = m.sender;
+          } else {
+            // 2. Fallback case if it's still processing raw database object formats 
+            const creatorId = t.user?._id || t.user;
+            normalizedSender = String(m.sender) === String(creatorId) ? 'user' : 'admin';
+          }
+
+          return {
+            id: m.id || m._id || Math.random().toString(),
+            sender: normalizedSender,
+            text: typeof m.message === 'object' ? JSON.stringify(m.message) : String(m.message || m.text || ''),
+            timestamp: m.createdAt || m.timestamp ? new Date(m.createdAt || m.timestamp) : new Date(),
+          };
+        })
         : [];
 
       // Safely extract creator name string to avoid rendering a nested user object

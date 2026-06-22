@@ -33,6 +33,8 @@ export const TicketChat: React.FC<TicketChatProps> = ({ ticket }) => {
     }
   };
 
+  console.log(ticket)
+
   return (
     <Card className="w-full max-w-4xl mx-auto border border-zinc-200 shadow-xl rounded-2xl overflow-hidden bg-white flex flex-col h-[650px] dir-rtl">
       <CardHeader className="bg-zinc-50/70 border-b border-zinc-100 p-5 flex flex-row items-center justify-between space-y-0">
@@ -58,6 +60,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({ ticket }) => {
 
       <CardContent className="flex-1 overflow-y-auto p-6 space-y-4 bg-zinc-50/30 mb-0">
         {ticket.messages.map(msg => (
+          /* Checks if msg.sender is string 'admin' to handle alignment and bubble styles */
           <div key={msg.id} className={`flex w-full ${msg.sender === 'admin' ? 'justify-start' : 'justify-end'}`}>
             <div className="flex flex-col max-w-[75%] space-y-1">
               <div className={`px-4 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap
