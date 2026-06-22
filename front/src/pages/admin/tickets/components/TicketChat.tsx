@@ -22,18 +22,19 @@ export const TicketChat: React.FC<TicketChatProps> = ({ ticket }) => {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Read the status mapping helper safely
+  const isClosed = ticket.status === 'بسته شده';
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [ticket.messages]);
 
   const handleSend = () => {
-    if (message) {
+    if (message && !isClosed) {
       addMessage(ticket.id, { sender: 'admin', text: message });
       setMessage('');
     }
   };
-
-  console.log(ticket)
 
   return (
     <Card className="w-full max-w-4xl mx-auto border border-zinc-200 shadow-xl rounded-2xl overflow-hidden bg-white flex flex-col h-[650px] dir-rtl">
@@ -60,7 +61,6 @@ export const TicketChat: React.FC<TicketChatProps> = ({ ticket }) => {
 
       <CardContent className="flex-1 overflow-y-auto p-6 space-y-4 bg-zinc-50/30 mb-0">
         {ticket.messages.map(msg => (
-          /* Checks if msg.sender is string 'admin' to handle alignment and bubble styles */
           <div key={msg.id} className={`flex w-full ${msg.sender === 'admin' ? 'justify-start' : 'justify-end'}`}>
             <div className="flex flex-col max-w-[75%] space-y-1">
               <div className={`px-4 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap
@@ -82,14 +82,16 @@ export const TicketChat: React.FC<TicketChatProps> = ({ ticket }) => {
 
       <div className="p-4 border-t border-zinc-100 bg-white flex items-end gap-2">
         <Textarea
-          placeholder="پیام جدید"
+          placeholder={isClosed ? "این تیکت بسته شده است" : "پیام جدید"}
+          disabled={isClosed}
           value={message}
           onChange={e => setMessage(e.target.value)}
-          className="flex-1 min-h-[50px] max-h-[120px] resize-none border-zinc-200 rounded-xl bg-zinc-50/50 p-3 text-sm focus-visible:ring-zinc-400 focus-visible:bg-white transition"
+          className="flex-1 min-h-[50px] max-h-[120px] resize-none border-zinc-200 rounded-xl bg-zinc-50/50 p-3 text-sm focus-visible:ring-zinc-400 focus-visible:bg-white transition disabled:opacity-60"
         />
         <Button
           onClick={handleSend}
-          className="bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl px-5 h-11 flex items-center transition font-medium shadow-sm"
+          disabled={isClosed || !message.trim()}
+          className="bg-zinc-950 hover:bg-zinc-800 text-white rounded-xl px-5 h-11 flex items-center transition font-medium shadow-sm default:disabled:opacity-50"
         >
           ارسال
         </Button>

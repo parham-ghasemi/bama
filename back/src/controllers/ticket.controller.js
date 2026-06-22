@@ -56,6 +56,11 @@ exports.replyToTicket = async (req, res) => {
     const ticket = await Ticket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ msg: 'Ticket not found' });
 
+    // CRITICAL: Block messages if the ticket is closed
+    if (ticket.status === 'closed') {
+      return res.status(400).json({ msg: 'این تیکت بسته شده است و امکان ارسال پیام وجود ندارد' });
+    }
+
     // Security: Only the ticket creator or an admin can send a message
     if (ticket.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ msg: 'Access denied' });
@@ -65,11 +70,6 @@ exports.replyToTicket = async (req, res) => {
       sender: req.user.id,
       message
     });
-
-    // Automatically re-open if user replies to a closed ticket
-    if (req.user.role !== 'admin') {
-      ticket.status = 'open';
-    }
 
     await ticket.save();
 
