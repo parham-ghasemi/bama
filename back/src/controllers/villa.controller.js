@@ -379,15 +379,60 @@ exports.editVilla = async (req, res) => {
     const villa = await Villa.findById(req.params.id);
     if (!villa) return res.status(404).json({ message: 'Villa not found' });
 
-    // Owner can only edit pending villas, admin can edit anything
+    // 1. Authorization: Owner can only edit pending villas, admin can edit anything
     if (req.user.role !== 'admin' && (villa.status !== 'pending' || villa.owner.toString() !== req.user.id)) {
-      return res.status(403).json({ message: 'You can only edit your pending villas' });
+      return res.status(403).json({ message: 'شما فقط مجاز به ویرایش ویلاهای در انتظار بررسی خود هستید.' });
     }
 
-    Object.assign(villa, req.body);
+    // 2. Destructure and whitelist editable fields from req.body
+    const {
+      name, address, extraInformation, rules, items, images, price,
+      maxAdults, maxChildren, city, numberOfRooms, numberOfDoubleBeds,
+      numberOfBeds, numberOfBathrooms, numberOfIranianToilets, numberOfFarangiToilets
+    } = req.body;
+
+    // 3. Handle City Conversion if a new city name string is sent
+    if (city) {
+      const cityDoc = await City.findOne({ name: city.trim() });
+      if (!cityDoc) {
+        return res.status(400).json({ message: "شهر وارد شده یافت نشد" });
+      }
+      villa.city = cityDoc._id; // Convert back to proper ObjectId
+    }
+
+    // 4. Update allowed fields manually or safely via assignment
+    if (name !== undefined) villa.name = name;
+    if (address !== undefined) villa.address = address;
+    if (extraInformation !== undefined) villa.extraInformation = extraInformation || '';
+    if (rules !== undefined) villa.rules = rules;
+    if (items !== undefined) villa.items = items;
+    if (images !== undefined) villa.images = images;
+    if (price !== undefined) villa.price = price;
+    if (maxAdults !== undefined) villa.maxAdults = maxAdults;
+    if (maxChildren !== undefined) villa.maxChildren = maxChildren || 0;
+
+    // Room specs updates
+    if (numberOfRooms !== undefined) villa.numberOfRooms = numberOfRooms || 0;
+    if (numberOfDoubleBeds !== undefined) villa.numberOfDoubleBeds = numberOfDoubleBeds || 0;
+    if (numberOfBeds !== undefined) villa.numberOfBeds = numberOfBeds || 0;
+    if (numberOfBathrooms !== undefined) villa.numberOfBathrooms = numberOfBathrooms || 0;
+    if (numberOfIranianToilets !== undefined) villa.numberOfIranianToilets = numberOfIranianToilets || 0;
+    if (numberOfFarangiToilets !== undefined) villa.numberOfFarangiToilets = numberOfFarangiToilets || 0;
+
+    // 5. Reset status back to 'pending' if a regular owner edits an approved or rejected villa
+    // (If your current business rules require re-review after edits)
+    if (req.user.role !== 'admin') {
+      villa.status = 'pending';
+    }
+
     await villa.save();
-    res.json({ message: 'Villa updated successfully', villa });
+
+    res.json({
+      message: 'تغییرات ویلا با موفقیت ثبت شد و در حال بررسی است.',
+      villa
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error updating villa', error: error.message });
   }
 };

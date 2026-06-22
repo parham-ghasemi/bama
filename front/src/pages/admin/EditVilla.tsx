@@ -1,88 +1,148 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import api from '../../lib/axiosConfig';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Textarea } from '../../components/ui/textarea';
-import { Label } from '../../components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { FaArrowLeft, FaPlus, FaTimes } from 'react-icons/fa';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { cities } from "../../components/cities";
+
+import {
+  FaBed,
+  FaBath,
+  FaToilet,
+  FaTv,
+  FaTimes,
+  FaArrowLeft,
+  FaPlus,
+} from "react-icons/fa";
+import {
+  MdOutlineLtePlusMobiledata,
+  MdMeetingRoom,
+} from "react-icons/md";
+import { TbAirConditioning, TbFridge } from "react-icons/tb";
+import { IoIosWater } from "react-icons/io";
+import { PiSecurityCameraDuotone } from "react-icons/pi";
+import { IoBedOutline } from "react-icons/io5";
+
+import Footer from "../../components/Footer";
+
+// shadcn/ui
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Textarea } from "../../components/ui/textarea";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Badge } from "../../components/ui/badge";
+
+// Combobox
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "../../components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../../components/ui/popover";
+
+import api from "../../lib/axiosConfig";
+import { toast } from "sonner";
 
 const EditVilla = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<any>({
-    name: '',
-    address: '',
-    extraInformation: '',
-    price: 0,
-    maxAdults: 1,
-    maxChildren: 0,
-    numberOfRooms: 0,
-    numberOfDoubleBeds: 0,
-    numberOfBeds: 0,
-    numberOfBathrooms: 0,
-    numberOfIranianToilets: 0,
-    numberOfFarangiToilets: 0,
-    items: [] as string[],
-    rules: {} as Record<string, boolean>,
-    images: [] as string[],
-  });
-
-  const [newItem, setNewItem] = useState('');
-  const [newImageUrl, setNewImageUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  // Rule options (labels بدون کلمهٔ "مجاز" تا با صفحه ثبت یکسان باشد)
-  const ruleOptions = [
-    { key: 'petsAllowed', label: 'ورود حیوانات خانگی' },
-    { key: 'smokingAllowed', label: 'استعمال دخانیات' },
-    { key: 'eventsAllowed', label: 'برگزاری مراسم' },
-    { key: 'childrenAllowed', label: 'پذیرش کودکان' },
-    { key: 'partiesAllowed', label: 'برگزاری مهمانی' },
+  // Form States
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
+
+  const [price, setPrice] = useState<number>(0);
+  const [maxAdults, setMaxAdults] = useState<number>(4);
+  const [maxChildren, setMaxChildren] = useState<number>(2);
+
+  const [numberOfRooms, setNumberOfRooms] = useState<number>(2);
+  const [numberOfDoubleBeds, setNumberOfDoubleBeds] = useState<number>(1);
+  const [numberOfBeds, setNumberOfBeds] = useState<number>(3);
+  const [numberOfBathrooms, setNumberOfBathrooms] = useState<number>(1);
+  const [numberOfIranianToilets, setNumberOfIranianToilets] = useState<number>(1);
+  const [numberOfFarangiToilets, setNumberOfFarangiToilets] = useState<number>(1);
+
+  const [extraInformation, setExtraInformation] = useState("");
+
+  const [rules, setRules] = useState({
+    singleGroups: true,
+    smoking: false,
+    pets: false,
+    ceremonies: false,
+  });
+
+  const amenityList = [
+    { key: "mobileSignal", label: "آنتن دهی موبایل", icon: MdOutlineLtePlusMobiledata },
+    { key: "airConditioning", label: "سیستم سرمایشی", icon: TbAirConditioning },
+    { key: "fridge", label: "یخچال", icon: TbFridge },
+    { key: "tv", label: "تلویزیون", icon: FaTv },
+    { key: "drinkingWater", label: "آب آشامیدنی", icon: IoIosWater },
+    { key: "security", label: "نگهبان", icon: PiSecurityCameraDuotone },
   ];
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
-  const capacityFields = [
-    { label: 'قیمت هر شب (ریال)', field: 'price' },
-    { label: 'حداکثر بزرگسال', field: 'maxAdults' },
-    { label: 'حداکثر کودک', field: 'maxChildren' },
-    { label: 'تعداد اتاق‌ها', field: 'numberOfRooms' },
-    { label: 'تخت دو نفره', field: 'numberOfDoubleBeds' },
-    { label: 'تعداد تخت‌ها', field: 'numberOfBeds' },
-    { label: 'تعداد حمام', field: 'numberOfBathrooms' },
-    { label: 'سرویس ایرانی', field: 'numberOfIranianToilets' },
-    { label: 'سرویس فرنگی', field: 'numberOfFarangiToilets' },
-  ];
+  // Images state management
+  // serverImages holds strings returned by database
+  const [serverImages, setServerImages] = useState<string[]>([]);
+  // newImageFiles handles any fresh image selections pending upload
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
-  // Fetch villa
+  // Combined order indexing tool
+  const [mainImageIndex, setMainImageIndex] = useState<number>(0);
+
+  // Fetch Existing Data
   useEffect(() => {
     const fetchVilla = async () => {
       try {
         const res = await api.get(`/villas/${id}`);
         const villa = res.data;
 
-        setFormData({
-          name: villa.name || '',
-          address: villa.address || '',
-          extraInformation: villa.extraInformation || '',
-          price: villa.price || 0,
-          maxAdults: villa.maxAdults || 1,
-          maxChildren: villa.maxChildren || 0,
-          numberOfRooms: villa.numberOfRooms || 0,
-          numberOfDoubleBeds: villa.numberOfDoubleBeds || 0,
-          numberOfBeds: villa.numberOfBeds || 0,
-          numberOfBathrooms: villa.numberOfBathrooms || 0,
-          numberOfIranianToilets: villa.numberOfIranianToilets || 0,
-          numberOfFarangiToilets: villa.numberOfFarangiToilets || 0,
-          items: villa.items || [],
-          rules: villa.rules || {},
-          images: villa.images || [],
-        });
+        setName(villa.name || "");
+        setAddress(villa.address || "");
+
+        if (villa.city && typeof villa.city === 'object') {
+          // Change villa.city._id to villa.city.name so the UI receives the Persian text
+          setSelectedCity(villa.city.name || "");
+        } else {
+          setSelectedCity(villa.city || "");
+        }
+
+        setPrice(villa.price || 0);
+        setMaxAdults(villa.maxAdults || 4);
+        setMaxChildren(villa.maxChildren || 2);
+        setNumberOfRooms(villa.numberOfRooms || 2);
+        setNumberOfDoubleBeds(villa.numberOfDoubleBeds || 1);
+        setNumberOfBeds(villa.numberOfBeds || 3);
+        setNumberOfBathrooms(villa.numberOfBathrooms || 1);
+        setNumberOfIranianToilets(villa.numberOfIranianToilets || 1);
+        setNumberOfFarangiToilets(villa.numberOfFarangiToilets || 1);
+        setExtraInformation(villa.extraInformation || "");
+
+        // Revert this back to handling raw string arrays safely
+        setSelectedAmenities(villa.items || []);
+        setServerImages(villa.images || []);
+
+        if (villa.rules) {
+          setRules({
+            singleGroups: villa.rules.singleGroups ?? true,
+            smoking: villa.rules.smoking ?? false,
+            pets: villa.rules.pets ?? false,
+            ceremonies: villa.rules.ceremonies ?? false,
+          });
+        }
       } catch (err) {
         console.error(err);
+        toast.error("خطا در دریافت اطلاعات ویلا");
       } finally {
         setLoading(false);
       }
@@ -90,69 +150,116 @@ const EditVilla = () => {
     fetchVilla();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+  const toggleAmenity = (key: string) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   };
 
-  const handleNumberChange = (name: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [name]: parseInt(value) || 0 }));
-  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
 
-  const addItem = () => {
-    if (newItem.trim()) {
-      setFormData((prev: any) => ({ ...prev, items: [...prev.items, newItem.trim()] }));
-      setNewItem('');
+    if (serverImages.length + newImageFiles.length + files.length > 10) {
+      toast.error("حداکثر ۱۰ تصویر مجاز است.");
+      return;
     }
+
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setNewImageFiles((prev) => [...prev, ...files]);
+    setNewImagePreviews((prev) => [...prev, ...newPreviews]);
   };
 
-  const removeItem = (index: number) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      items: prev.items.filter((_: string, i: number) => i !== index),
-    }));
+  const removeServerImage = (index: number) => {
+    setServerImages((prev) => prev.filter((_, i) => i !== index));
+    // Reset or balance main view fallback indexes if affected
+    if (mainImageIndex === index) setMainImageIndex(0);
+    else if (mainImageIndex > index) setMainImageIndex((prev) => prev - 1);
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
-      setFormData((prev: any) => ({ ...prev, images: [...prev.images, newImageUrl.trim()] }));
-      setNewImageUrl('');
-    }
+  const removeNewImage = (index: number) => {
+    URL.revokeObjectURL(newImagePreviews[index]);
+    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+
+    const absoluteIndex = serverImages.length + index;
+    if (mainImageIndex === absoluteIndex) setMainImageIndex(0);
+    else if (mainImageIndex > absoluteIndex) setMainImageIndex((prev) => prev - 1);
   };
 
-  const removeImage = (index: number) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      images: prev.images.filter((_: string, i: number) => i !== index),
-    }));
-  };
-
-  const toggleRule = (key: string) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      rules: {
-        ...prev.rules,
-        [key]: !(prev.rules[key] ?? false),
-      },
-    }));
+  const toggleRule = (key: keyof typeof rules) => {
+    setRules((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!selectedCity) {
+      toast.error("لطفاً شهر را انتخاب کنید.");
+      return;
+    }
+
     setSaving(true);
 
     try {
-      await api.put(`/villas/${id}`, formData);
+      // 1. Upload new files if added
+      let uploadedUrls: string[] = [];
+      if (newImageFiles.length > 0) {
+        const formData = new FormData();
+        newImageFiles.forEach((file) => formData.append("images", file));
 
-      toast.success('تغییرات با موفقیت ذخیره شد ✅');
+        const uploadRes = await api.post("/upload/multiple", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        uploadedUrls = uploadRes.data.urls;
+      }
+
+      // 2. Build final absolute images collection
+      const absoluteImages = [...serverImages, ...uploadedUrls];
+
+      // 3. Handle main image shift logic if index is valid
+      let orderedImages = absoluteImages;
+      if (absoluteImages.length > 0 && mainImageIndex < absoluteImages.length) {
+        const mainImage = absoluteImages[mainImageIndex];
+        orderedImages = [mainImage, ...absoluteImages.filter((_, i) => i !== mainImageIndex)];
+      }
+
+      const villaData = {
+        name,
+        address,
+        extraInformation,
+        rules,
+        items: selectedAmenities,
+        images: orderedImages,
+        price,
+        maxAdults,
+        maxChildren,
+        city: selectedCity,
+        numberOfRooms,
+        numberOfDoubleBeds,
+        numberOfBeds,
+        numberOfBathrooms,
+        numberOfIranianToilets,
+        numberOfFarangiToilets,
+      };
+
+      await api.put(`/villas/${id}`, villaData);
+
+      toast.success("تغییرات با موفقیت ذخیره شد! ✅");
       navigate(`/admin/listings/${id}`);
-    } catch (err) {
-      console.error(err);
-      toast.error('خطا در ذخیره تغییرات');
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "خطا در ذخیره تغییرات.");
     } finally {
       setSaving(false);
     }
   };
+
+  // Combine collections neatly to map images onto uniform template cards
+  const combinedImages = [
+    ...serverImages.map((url) => ({ type: "server" as const, src: url })),
+    ...newImagePreviews.map((src) => ({ type: "new" as const, src })),
+  ];
 
   if (loading) return <p className="text-center py-20">در حال بارگذاری...</p>;
 
@@ -163,7 +270,7 @@ const EditVilla = () => {
         <div className="mb-12">
           <Link
             to={`/admin/listings/${id}`}
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-black mb-6"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-black mb-6 font-medium text-lg"
           >
             <FaArrowLeft /> بازگشت به جزئیات
           </Link>
@@ -180,24 +287,57 @@ const EditVilla = () => {
               <CardTitle className="text-2xl">اطلاعات پایه</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
-              <div className="space-y-3">
-                <Label className="text-base">نام ویلا</Label>
-                <Input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="h-12"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <Label className="text-base">نام ویلا</Label>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-12"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-base">شهر</Label>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full h-12 justify-start text-right font-normal"
+                      >
+                        {selectedCity || "انتخاب شهر"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start">
+                      <Command>
+                        <CommandInput placeholder="جستجوی شهر..." className="text-right" />
+                        <CommandEmpty>شهر یافت نشد</CommandEmpty>
+                        <CommandGroup className="max-h-80 overflow-auto">
+                          {cities.map((city) => (
+                            <CommandItem
+                              key={city.name}
+                              value={city.name}
+                              onSelect={() => {
+                                setSelectedCity(city.name);
+                                setOpen(false);
+                              }}
+                            >
+                              {city.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div className="space-y-3">
                 <Label className="text-base">آدرس دقیق</Label>
                 <Textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="استان البرز، چهارباغ، خیابان اصلی، کوچه ۱۲، پلاک ۴۵"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="min-h-32 resize-y"
                   required
                 />
@@ -212,13 +352,23 @@ const EditVilla = () => {
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                {capacityFields.map(({ label, field }) => (
-                  <div key={field} className="space-y-3">
-                    <Label className="text-base">{label}</Label>
+                {[
+                  { label: "قیمت هر شب (تومان)", value: price, setter: setPrice },
+                  { label: "حداکثر بزرگسال", value: maxAdults, setter: setMaxAdults },
+                  { label: "حداکثر کودک", value: maxChildren, setter: setMaxChildren },
+                  { label: "تعداد اتاق‌ها", value: numberOfRooms, setter: setNumberOfRooms },
+                  { label: "تخت دو نفره", value: numberOfDoubleBeds, setter: setNumberOfDoubleBeds },
+                  { label: "تعداد تخت‌ها", value: numberOfBeds, setter: setNumberOfBeds },
+                  { label: "تعداد حمام", value: numberOfBathrooms, setter: setNumberOfBathrooms },
+                  { label: "سرویس ایرانی", value: numberOfIranianToilets, setter: setNumberOfIranianToilets },
+                  { label: "سرویس فرنگی", value: numberOfFarangiToilets, setter: setNumberOfFarangiToilets },
+                ].map((item, i) => (
+                  <div key={i} className="space-y-3">
+                    <Label className="text-base">{item.label}</Label>
                     <Input
                       type="number"
-                      value={formData[field]}
-                      onChange={(e) => handleNumberChange(field, e.target.value)}
+                      value={item.value}
+                      onChange={(e) => item.setter(Number(e.target.value))}
                       className="h-12"
                     />
                   </div>
@@ -230,38 +380,30 @@ const EditVilla = () => {
           {/* امکانات */}
           <Card className="transition-all hover:shadow-xl">
             <CardHeader>
-              <CardTitle className="text-2xl">امکانات</CardTitle>
+              <CardTitle className="text-2xl">امکانات مهم</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2 mb-6">
-                <Input
-                  placeholder="مثال: استخر، اینترنت، پارکینگ..."
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                  className="h-12"
-                />
-                <Button type="button" onClick={addItem} className="h-12">
-                  <FaPlus />
-                </Button>
-              </div>
-
-              <div className="flex flex-wrap gap-3">
-                {formData.items.map((item: string, idx: number) => (
-                  <div
-                    key={idx}
-                    className="bg-white border rounded-3xl px-6 py-3 flex items-center gap-3 text-base font-medium"
-                  >
-                    <span>{item}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(idx)}
-                      className="text-red-500 hover:text-red-600"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {amenityList.map((amenity) => {
+                  const isChecked = selectedAmenities.includes(amenity.key);
+                  return (
+                    <label
+                      key={amenity.key}
+                      className={`flex items-center gap-4 border rounded-3xl p-6 cursor-pointer transition-all duration-200 hover:shadow-md ${isChecked ? "border-blue-400 bg-blue-50 shadow-sm" : "border-neutral-200 hover:border-neutral-300"
+                        }`}
                     >
-                      <FaTimes size={16} />
-                    </button>
-                  </div>
-                ))}
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={() => toggleAmenity(amenity.key)}
+                        className="data-[state=checked]:bg-blue-500"
+                      />
+                      <div className="flex items-center gap-4">
+                        <amenity.icon size={32} className="text-neutral-600" />
+                        <span className="font-medium text-lg">{amenity.label}</span>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -272,8 +414,13 @@ const EditVilla = () => {
               <CardTitle className="text-2xl">قوانین اقامتگاه</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {ruleOptions.map((rule) => {
-                const isAllowed = formData.rules[rule.key] ?? false;
+              {[
+                { key: "singleGroups", label: "پذیرش گروه‌های مجردی (فقط آقایان یا خانم‌ها)" },
+                { key: "smoking", label: "استعمال دخانیات" },
+                { key: "pets", label: "ورود حیوانات خانگی" },
+                { key: "ceremonies", label: "برگزاری مراسم" },
+              ].map((rule) => {
+                const isAllowed = rules[rule.key as keyof typeof rules];
                 return (
                   <div
                     key={rule.key}
@@ -283,17 +430,17 @@ const EditVilla = () => {
                     <div className="flex gap-3">
                       <Button
                         type="button"
-                        variant={isAllowed ? 'default' : 'outline'}
-                        className={`px-8 transition-all ${isAllowed ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
-                        onClick={() => toggleRule(rule.key)}
+                        variant={isAllowed ? "default" : "outline"}
+                        className={`px-8 transition-all ${isAllowed ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                        onClick={() => toggleRule(rule.key as keyof typeof rules)}
                       >
                         مجاز
                       </Button>
                       <Button
                         type="button"
-                        variant={!isAllowed ? 'default' : 'outline'}
-                        className={`px-8 transition-all ${!isAllowed ? 'bg-red-600 hover:bg-red-700' : ''}`}
-                        onClick={() => toggleRule(rule.key)}
+                        variant={!isAllowed ? "default" : "outline"}
+                        className={`px-8 transition-all ${!isAllowed ? "bg-red-600 hover:bg-red-700" : ""}`}
+                        onClick={() => toggleRule(rule.key as keyof typeof rules)}
                       >
                         مجاز نیست
                       </Button>
@@ -311,10 +458,8 @@ const EditVilla = () => {
             </CardHeader>
             <CardContent>
               <Textarea
-                name="extraInformation"
-                value={formData.extraInformation}
-                onChange={handleChange}
-                placeholder="این ویلا دارای فضای پارک خودرو، حیاط خلوت آرام، دسترسی آسان به جاده..."
+                value={extraInformation}
+                onChange={(e) => setExtraInformation(e.target.value)}
                 className="min-h-44 text-base"
               />
             </CardContent>
@@ -324,40 +469,67 @@ const EditVilla = () => {
           <Card className="transition-all hover:shadow-xl">
             <CardHeader>
               <CardTitle className="text-2xl">تصاویر ویلا</CardTitle>
+              <p className="text-neutral-500">حداکثر ۱۰ تصویر • تصویر اصلی به عنوان کاور نمایش داده می‌شود</p>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2 mb-8">
-                <Input
-                  placeholder="URL تصویر جدید..."
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  className="h-12"
+              <label className="group flex flex-col items-center justify-center border-2 border-dashed border-blue-300 hover:border-blue-400 bg-blue-50/30 rounded-3xl p-14 cursor-pointer transition-all duration-300 hover:scale-[1.01]">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
                 />
-                <Button type="button" onClick={addImage} className="h-12">
-                  <FaPlus />
-                </Button>
-              </div>
+                <div className="text-6xl mb-6 transition-transform group-hover:scale-110">📸</div>
+                <p className="font-semibold text-xl text-blue-700">کلیک کنید یا تصاویر جدید را اینجا رها کنید</p>
+              </label>
 
-              {formData.images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-                  {formData.images.map((url: string, idx: number) => (
-                    <div key={idx} className="relative group rounded-3xl overflow-hidden border shadow-sm">
-                      <img
-                        src={`${import.meta.env.VITE_BASE_IMG_URL}${url}`}
-                        alt={`تصویر ${idx}`}
-                        className="w-full aspect-video object-cover"
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="destructive"
-                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all"
-                        onClick={() => removeImage(idx)}
+              {combinedImages.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mt-10">
+                  {combinedImages.map((img, index) => {
+                    // Check if image source is remote static path or a local object URL blob string
+                    const displaySrc = img.type === "server"
+                      ? `${import.meta.env.VITE_BASE_IMG_URL}${img.src}`
+                      : img.src;
+
+                    return (
+                      <div
+                        key={index}
+                        className={`relative group rounded-3xl overflow-hidden border shadow-sm ${mainImageIndex === index ? "border-blue-500 border-2" : "border-gray-300"
+                          }`}
                       >
-                        <FaTimes size={18} />
-                      </Button>
-                    </div>
-                  ))}
+                        <img src={displaySrc} alt="" className="w-full aspect-[3/2] object-cover" />
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="destructive"
+                          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all"
+                          onClick={() =>
+                            img.type === "server"
+                              ? removeServerImage(index)
+                              : removeNewImage(index - serverImages.length)
+                          }
+                        >
+                          <FaTimes size={18} />
+                        </Button>
+                        {mainImageIndex === index ? (
+                          <Badge className="absolute bottom-3 left-3 bg-blue-500 text-white">
+                            تصویر اصلی
+                          </Badge>
+                        ) : (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-all text-xs"
+                            onClick={() => setMainImageIndex(index)}
+                          >
+                            تنظیم به عنوان تصویر اصلی
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
@@ -368,12 +540,13 @@ const EditVilla = () => {
             type="submit"
             size="lg"
             disabled={saving}
-            className="w-full h-16 text-xl font-bold rounded-3xl bg-green-600 hover:bg-green-700 transition-all active:scale-[0.98] disabled:bg-green-400"
+            className="w-full h-16 text-xl font-bold rounded-3xl bg-blue-700 hover:bg-blue-800 transition-all active:scale-[0.98] disabled:bg-blue-400"
           >
-            {saving ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
+            {saving ? "در حال ذخیره..." : "ذخیره تغییرات نهایی"}
           </Button>
         </form>
       </div>
+      <Footer />
     </div>
   );
 };

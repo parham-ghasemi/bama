@@ -170,7 +170,7 @@ const Home = () => {
       </div>
 
       <div className="w-full max-w-7xl bg-white relative mx-auto mt-14 md:mt-96 rounded-xl min-h-52 p-4 md:p-6">
-        <VillaTypes />
+        {/* <VillaTypes /> */}
 
         {/* ردیف اول - محبوب‌ترین شهرها */}
         <div className="mt-28 md:mt-7">
