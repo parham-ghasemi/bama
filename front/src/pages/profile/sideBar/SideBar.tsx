@@ -6,6 +6,7 @@ import { BsReceipt } from "react-icons/bs";
 import { BsWallet2 } from "react-icons/bs";
 import { BsCreditCard } from "react-icons/bs";
 import { Link, useLocation } from "react-router-dom";
+import { BsChatSquareDots } from "react-icons/bs";
 import { cn } from "../../../lib/utils";
 
 const Item = ({ icon, subTitle, title, href, isActive }: { icon: any; title: string; subTitle: string; href: string; isActive: boolean }) => {
@@ -42,6 +43,15 @@ const SideBar = () => {
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> اعتبار و دعوت </p>
       <Item icon={<BsWallet2 size={24} />} subTitle="موجودی، افزایش اعتبار" title="کیف پول" href="/profile/wallet" isActive={location.pathname === "/profile/wallet"} />
       <Item icon={<BsCreditCard size={24} />} subTitle="کارت هدیه جاباما و دریافت اعتبار برای سفر" title="اعتبار سفر" href="/profile/travel-credit" isActive={location.pathname === "/profile/travel-credit"} />
+
+      <p className="text-neutral-400 text-[11px] mr-5 mt-3"> پشتیبانی </p>
+      <Item
+        icon={<BsChatSquareDots size={24} />}
+        subTitle="ارسال تیکت و گفت‌وگو با پشتیبانی"
+        title="پشتیبانی / تیکت‌ها"
+        href="/profile/tickets"
+        isActive={location.pathname === "/profile/tickets"}
+      />
     </div>
   )
 }

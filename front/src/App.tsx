@@ -35,6 +35,7 @@ import AddVilla from "./pages/addVilla/AddVilla";
 import EditVilla from "./pages/admin/EditVilla";
 import Booking from "./pages/booking/Booking";
 import MyVillas from "./pages/profile/pages/myVillas/MyVillas";
+import Tickets from "./pages/profile/pages/tickets/Tickets";
 
 export default function App() {
   return (
@@ -63,6 +64,7 @@ export default function App() {
               <Route path="transactions" element={<Transactions />} />
               <Route path="wallet" element={<Wallet />} />
               <Route path="my-villas" element={<MyVillas />} />
+              <Route path="tickets" element={<Tickets />} />
             </Route>
 
             {/* Admin routes */}

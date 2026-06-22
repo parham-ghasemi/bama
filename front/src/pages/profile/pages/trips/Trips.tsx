@@ -4,7 +4,7 @@ import { FaArrowLeft, FaArrowRight, FaStar, FaTimes } from "react-icons/fa";
 import { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../../../../lib/axiosConfig";
 import moment from "moment-jalaali";
@@ -180,14 +180,24 @@ const ReportModal = ({ trip, isOpen, onClose }: { trip: Trip | null; isOpen: boo
     );
   };
 
-  const handleSubmit = () => {
-    console.log({
-      tripId: trip.id,
-      reasons: selectedReasons,
-      additional: additional
-    });
-    toast.success('گزارش با موفقیت ارسال شد');
-    onClose();
+  const handleSubmit = async () => {
+    try {
+      const contextTitle = `گزارش تخلف: ${trip.villaName}`;
+      const contextMessage = `دلایل انتخاب شده: ${selectedReasons.join(' - ')}\nتوضیحات: ${additional}`;
+
+      await api.post('/tickets', {
+        title: contextTitle,
+        message: contextMessage
+      });
+
+      toast.success('گزارش با موفقیت به عنوان تیکت ارسال شد');
+      onClose();
+      // Optional: redirect straight to tickets view
+      redirect('/profile/tickets');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('خطا در ارسال گزارش');
+    }
   };
 
   return (
