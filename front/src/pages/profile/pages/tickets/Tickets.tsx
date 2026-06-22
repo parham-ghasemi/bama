@@ -112,7 +112,6 @@ const Tickets = () => {
           {/* User Side Message Flow */}
           <CardContent className="flex-1 overflow-y-auto space-y-4 p-6 bg-zinc-50/20">
             {selectedTicket.messages.map((msg, index) => {
-              // Assumes first message is always from the user
               const isUser = msg.sender === selectedTicket.messages[0].sender;
               return (
                 <div key={index} className={`flex w-full ${isUser ? 'justify-start' : 'justify-end'}`}>
@@ -120,7 +119,7 @@ const Tickets = () => {
                     <div className={`p-3 shadow-sm text-sm leading-relaxed whitespace-pre-wrap rounded-2xl
                       ${isUser
                         ? 'bg-zinc-900 text-white rounded-tr-none'
-                        : 'bg-white border border-zinc-200 text-zinc-800 rounded-tl-none'
+                        : 'bg-sky-50 text-sky-950 border border-sky-100 rounded-tl-none'
                       }`}
                     >
                       {msg.message}
