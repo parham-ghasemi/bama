@@ -436,3 +436,53 @@ exports.editVilla = async (req, res) => {
     res.status(500).json({ message: 'Error updating villa', error: error.message });
   }
 };
+
+// === NEW: User Dashboard - Get listings owned by the logged-in user ===
+exports.getMyVillas = async (req, res) => {
+  try {
+    // Find all villas owned by this user
+    const villas = await Villa.find({ owner: req.user.id })
+      .populate('city', 'name')
+      .sort({ createdAt: -1 });
+
+    res.json(villas);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'خطا در دریافت لیست اقامتگاه‌های شما', error: error.message });
+  }
+};
+
+// === NEW: User Dashboard - Owner toggles visibility (active / inactive) ===
+exports.toggleVillaVisibility = async (req, res) => {
+  try {
+    const villa = await Villa.findById(req.params.id);
+    if (!villa) {
+      return res.status(404).json({ message: 'اقامتگاه یافت نشد' });
+    }
+
+    // Security: Only the real owner can change its visibility status
+    if (villa.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'شما دسترسی به تغییر وضعیت این اقامتگاه را ندارید.' });
+    }
+
+    // Switch state safely between approved (publicly visible) and inactive (hidden)
+    if (villa.status === 'approved') {
+      villa.status = 'inactive';
+      await villa.save();
+      return res.json({ message: 'اقامتگاه با موفقیت غیرفعال و از دید عموم پنهان شد.', status: villa.status });
+    } else if (villa.status === 'inactive') {
+      // Re-activating goes back to pending or approved? 
+      // If it was already approved prior, we can put it back to approved safely.
+      villa.status = 'approved';
+      await villa.save();
+      return res.json({ message: 'اقامتگاه با موفقیت فعال و به بخش آگهی‌ها بازگشت.', status: villa.status });
+    } else {
+      return res.status(400).json({
+        message: 'تنها اقامتگاه‌های تایید شده یا غیرفعال قابلیت تغییر وضعیت پدیداری دارند.'
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'خطا در تغییر وضعیت اقامتگاه', error: error.message });
+  }
+};

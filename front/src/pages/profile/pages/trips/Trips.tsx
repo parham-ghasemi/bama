@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/tabs/tabs";
 import { useState, useEffect } from "react";
 import { FaArrowLeft, FaArrowRight, FaStar, FaTimes } from "react-icons/fa";
 import { DateObject } from "react-multi-date-picker";

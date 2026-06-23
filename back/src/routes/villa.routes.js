@@ -55,6 +55,21 @@ router.put('/:id/deactivate', auth, isAdmin, villaController.deactivateVilla);
 router.put('/:id/activate', auth, isAdmin, villaController.activateVilla);
 
 // =============================================
+// AUTHENTICATED USER ROUTES
+// =============================================
+
+// Get listings owned by the current logged-in user
+router.get('/my-listings', auth, villaController.getMyVillas);
+
+// Toggle visibility (active/inactive) for user's own villa
+router.put('/:id/toggle-visibility', auth, villaController.toggleVillaVisibility);
+
+// Create a new villa
+router.post('/', auth, villaController.createVilla);
+
+// ... (keep toggleLike, getLikeStatus, etc. right below)
+
+// =============================================
 // PARAMETERIZED ROUTES (must be LAST)
 // =============================================
 

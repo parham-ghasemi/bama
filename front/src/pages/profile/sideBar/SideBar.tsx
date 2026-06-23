@@ -1,12 +1,15 @@
-import { BsSuitcaseLg } from "react-icons/bs";
 import { CiHeart, CiRollingSuitcase } from "react-icons/ci";
-import { BsToggles } from "react-icons/bs";
-import { BsPerson } from "react-icons/bs";
-import { BsReceipt } from "react-icons/bs";
-import { BsWallet2 } from "react-icons/bs";
-import { BsCreditCard } from "react-icons/bs";
+import {
+  BsSuitcaseLg,
+  BsToggles,
+  BsPerson,
+  BsReceipt,
+  BsWallet2,
+  BsCreditCard,
+  BsChatSquareDots,
+  BsHouseDoor
+} from "react-icons/bs";
 import { Link, useLocation } from "react-router-dom";
-import { BsChatSquareDots } from "react-icons/bs";
 import { cn } from "../../../lib/utils";
 
 const Item = ({ icon, subTitle, title, href, isActive }: { icon: any; title: string; subTitle: string; href: string; isActive: boolean }) => {
@@ -34,7 +37,9 @@ const SideBar = () => {
       <Item icon={<CiHeart size={24} />} subTitle="لیست اقامتگاه‌ها و هتل‌های مورد علاقه" title="مورد علاقه‌ها" href="/profile/favorites" isActive={location.pathname === "/profile/favorites"} />
 
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> میزبانی اقامتگاه </p>
-      <Item icon={<BsToggles size={24} />} subTitle="همین حالا اقامتگاهتان را ثبت و شروع به کسب درآمد کنید." title="میزبان شوید" href="/add-villa" isActive={location.pathname === "/faq/view-more"} />
+      {/* Restored icons and added matching BsHouseDoor for the listings page */}
+      <Item icon={<BsHouseDoor size={24} />} subTitle="مدیریت و مشاهده وضعیت اقامتگاه‌های ثبت شده" title="اقامتگاه‌های من" href="/profile/my-listings" isActive={location.pathname === "/profile/listings"} />
+      <Item icon={<BsToggles size={24} />} subTitle="همین حالا اقامتگاهتان را ثبت و شروع به کسب درآمد کنید." title="میزبان شوید" href="/add-villa" isActive={location.pathname === "/add-villa"} />
 
       <p className="text-neutral-400 text-[11px] mr-5 mt-3"> حساب کاربری </p>
       <Item icon={<BsPerson size={24} />} subTitle="مشاهده و ویرایش اطلاعات شخصی" title="اطلاعات حساب کاربری" href="/profile/account" isActive={location.pathname === "/profile/account"} />
@@ -56,4 +61,4 @@ const SideBar = () => {
   )
 }
 
-export default SideBar
+export default SideBar;
