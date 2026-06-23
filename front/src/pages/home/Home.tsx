@@ -18,7 +18,7 @@ const popularCityCards = [
   { img: "/home/shiraz.jpg", title: "اجاره ویلا در شیراز" },
   { img: "/home/tabriz.jpg", title: "اجاره ویلا در تبریز" },
   { img: "/home/karaj.jpg", title: "اجاره ویلا در کرج" },
-  { img: "/home/qom.jpg", title: "اجاره ویلا در قم" },
+  { img: "/home/qom.webp", title: "اجاره ویلا در قم" },
   { img: "/home/ahvaz.jpg", title: "اجاره ویلا در اهواز" },
 ];
 
